@@ -22,15 +22,20 @@ void readInstance(ifstream &instance, vector<Aircraft> &aircrafts)
         {
             istringstream iss(line);
             iss >> aircraft.earliest_time >> aircraft.target_time >> aircraft.latest_time
-            >> aircraft.penalty_before >> aircraft.penalty_after;
+                >> aircraft.penalty_before >> aircraft.penalty_after;
         }
 
-        if (getline(instance, line))
+        while (static_cast<int>(aircraft.separation_times.size()) < num_aircrafts && getline(instance, line))
         {
             istringstream iss(line);
             int time;
+
             while (iss >> time)
+            {
                 aircraft.separation_times.push_back(time);
+                if (static_cast<int>(aircraft.separation_times.size()) == num_aircrafts)
+                    break;
+            }
         }
 
         aircrafts.push_back(aircraft);
@@ -39,7 +44,7 @@ void readInstance(ifstream &instance, vector<Aircraft> &aircrafts)
 
 void printAircrafts(vector<Aircraft> &aircrafts)
 {
-    cout << "Dados das aeronaves lidos:\n\n";
+    cout << "Dados das " << aircrafts.size() << " aeronaves:\n\n";
     for (size_t i = 0; i < aircrafts.size(); i++)
     {
         cout << "Aircraft " << i + 1 << endl;
