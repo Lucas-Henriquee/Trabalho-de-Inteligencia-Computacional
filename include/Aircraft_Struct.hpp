@@ -3,12 +3,14 @@
 
 #include "defines.hpp"
 
-struct Aircraft {
+struct Aircraft
+{
+    int appearance_time;
     int earliest_time;
     int target_time;
     int latest_time;
-    double penalty_before;
-    double penalty_after;
+    float penalty_before;
+    float penalty_after;
     vector<int> separation_times;
 };
 
