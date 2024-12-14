@@ -1,0 +1,15 @@
+#ifndef AIRCRAFT_STRUCT_HPP
+#define AIRCRAFT_STRUCT_HPP
+
+#include "defines.hpp"
+
+struct Aircraft {
+    int earliest_time;
+    int target_time;
+    int latest_time;
+    double penalty_before;
+    double penalty_after;
+    vector<int> separation_times;
+};
+
+#endif // AIRCRAFT_STRUCT_HPP
