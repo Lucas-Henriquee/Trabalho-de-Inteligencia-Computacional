@@ -6,5 +6,6 @@
 
 void readInstance(ifstream &instance, vector<Aircraft> &aircrafts);
 void printAircrafts(vector<Aircraft> &aircrafts);
+void verifySeparationConstraint(Aircraft i, Aircraft j);
 
 #endif // AIRCRAFT_FUNCTIONS_HPP

@@ -5,6 +5,7 @@
 
 struct Aircraft
 {
+    int plane_index;
     int appearance_time;
     int earliest_time;
     int target_time;
