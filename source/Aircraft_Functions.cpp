@@ -71,6 +71,7 @@ void verifySeparationConstraint(Aircraft i, Aircraft j)
     int jiSeparationTime=i.separation_times[j_plane_index];
 
     if(i.latest_time<j.earliest_time)
+    {
         if(i.latest_time+ijSeparationTime<=j.earliest_time)
         {
             //i sempre vai pousar antes de j e condição de separacão é
@@ -82,7 +83,9 @@ void verifySeparationConstraint(Aircraft i, Aircraft j)
             //i sempre vai pousar antes de j mas condição de separação
             //deve ser verificada
         }
+    }
     if(j.latest_time<i.earliest_time)
+    {
         if(j.latest_time+jiSeparationTime<=i.earliest_time)
         {
             //j sempre vai pousar antes de i e condição de separacão é
@@ -94,6 +97,7 @@ void verifySeparationConstraint(Aircraft i, Aircraft j)
             //j sempre vai pousar antes de i mas condição de separação
             //deve ser verificada
         }
+    }
     else
     {
         //A ordem de pouso de i e j é incerta
