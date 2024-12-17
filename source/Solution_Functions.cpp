@@ -16,7 +16,7 @@ void printSolution(Solution solution)
           cout<<solution.aircraft_sequence[i].first + 1<<" / ";
           cout<<solution.aircraft_sequence[i].second<<endl;
       }
-      cout<< "Função objetivo: " << solution.objective_function << endl;
+      cout<< "Funcao objetivo: " << solution.objective_function << endl;
       cout<<endl<<endl;
 }
 

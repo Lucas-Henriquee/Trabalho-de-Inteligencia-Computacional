@@ -24,8 +24,9 @@ int main(int argc, char *argv[])
             printAircrafts(aircrafts);
 
             //Testar solução
-            Solution solution;
-            constructInitialSolution(aircrafts, solution);
+            //Solution solution;
+            //constructInitialSolution(aircrafts, solution);
+            Solution solution=Solution_to_airland1();
             viability_verifier(aircrafts, solution);
             calculateObjectiveFunction(aircrafts, solution);
             printSolution(solution);
