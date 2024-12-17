@@ -48,6 +48,7 @@ void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution)
 
     for (size_t i = 1; i < num_aircrafts; i++)
     {
+        cout << "Aircraft " << aircrafts[i].plane_index + 1 << " target time: " << aircrafts[i].target_time << " minimum time: " << solution.aircraft_sequence[i-1].second + aircrafts[i].separation_times[i-1] << endl;
         solution.aircraft_sequence.push_back(make_pair(aircrafts[i].plane_index, max(aircrafts[i].target_time, (solution.aircraft_sequence[i-1].second + aircrafts[i].separation_times[i-1]))));
     }
 }

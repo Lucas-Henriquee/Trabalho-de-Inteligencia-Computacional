@@ -66,5 +66,17 @@ void printAircrafts(vector<Aircraft> &aircrafts)
 
 void sortAircraftsbyTargetTime(vector<Aircraft> &aircrafts)
 {
-    sort(aircrafts.begin(), aircrafts.end(), [](Aircraft a, Aircraft b) { return a.target_time < b.target_time; });
+    // Sort aircrafts by target_time
+    sort(aircrafts.begin(), aircrafts.end(), [](const Aircraft &a, const Aircraft &b) {
+        return a.target_time < b.target_time;
+    });
+
+    // Reassign separate times to match the new order
+    for (size_t i = 0; i < aircrafts.size(); i++)
+    {
+        vector<int> new_separation_times;
+        for (size_t j = 0; j < aircrafts.size(); j++)
+            new_separation_times.push_back(aircrafts[i].separation_times[aircrafts[j].plane_index]);
+        aircrafts[i].separation_times = new_separation_times;
+    }
 }
