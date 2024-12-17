@@ -51,7 +51,7 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
             int previous_aircraft_id=solution.aircraft_sequence[i-1].first;
             int previous_aircraft_index=previous_aircraft_id-1;
             int previous_aircraft_solution_time=solution.aircraft_sequence[i-1].second;
-            int separation_time=aircrafts[current_aircraft_id].separation_times[previous_aircraft_index];
+            int separation_time=aircrafts[current_aircraft_id-1].separation_times[previous_aircraft_index];
 
             if(previous_aircraft_solution_time+separation_time>solution_time)
             {
