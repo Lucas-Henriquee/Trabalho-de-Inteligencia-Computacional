@@ -10,6 +10,8 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
     cout<<"Verificador de viabilidade da solucao:"<<endl;
     cout << "\n-------------------------------------------------------------------" << endl;
 
+    size_t error_counter=0;
+
     size_t num_aircrafts=aircrafts.size();
 
     for (size_t i=0; i<num_aircrafts; i++)
@@ -28,6 +30,8 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
             cout<<"Tempo da aeronave "<<current_aircraft_id<<" definido mais cedo que o possivel"<<endl;
             cout<<"Tempo minimo: "<<current_aircraft_earliest_time<<endl;
             cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
+
+            error_counter++;
         }
 
         //Se o tempo de solução for maior que o possível
@@ -38,6 +42,8 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
             cout<<"Tempo da aeronave "<<current_aircraft_id<<" definido mais tarde que o possivel"<<endl;
             cout<<"Tempo maximo: "<<current_aircraft_latest_time<<endl;
             cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
+            
+            error_counter++;
         }
 
         //Se o tempo de solução não atender ao tempo de separação da aeronave anterior
@@ -59,8 +65,15 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
                 cout<<"Tempo de separacao: "<<separation_time<<endl;
                 cout<<"Tempo da aeronave "<<current_aircraft_id<<" : "<<solution_time<<endl;
                 cout<<"Aeronave "<<current_aircraft_id<<" esta antecipada em "<<previous_aircraft_solution_time+separation_time-solution_time<<endl<<endl;
+                
+                error_counter++;
             }
         }
+    }
+
+    if(error_counter==0)
+    {
+        cout<<"Solucao viavel"<<endl;
     }
 
     cout << "\n-------------------------------------------------------------------" << endl;
