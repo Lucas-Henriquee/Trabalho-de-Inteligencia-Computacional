@@ -48,3 +48,12 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         
     }
 }
+
+// Solution Solution_to_airland1()
+// {
+//     Solution solution;
+//     solution.aircraft_sequence={3,4,5,1,8,6,7,9,10,2};
+//     solution.landing_times={510,521,555,559,573,576,577,591,657,774};
+//     solution.total_penalty=0;
+//     return solution;
+// }

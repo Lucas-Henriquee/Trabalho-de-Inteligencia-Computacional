@@ -1,6 +1,8 @@
 #include "include/Aircraft_Struct.hpp"
 #include "include/Aircraft_Functions.hpp"
 #include "include/defines.hpp"
+#include "include/Solution_Struct.hpp"
+//#include "source/Viability_Verifier.cpp"
 //#include "source/Solution_Functions.cpp"
 
 int main(int argc, char *argv[])
@@ -25,6 +27,10 @@ int main(int argc, char *argv[])
             //solution.aircraft_sequence={1,2,3,4,5,6,7,8,9,10};
             //solution.landing_times={5,10,12,14,16,18,20,30,40,55};
             //printSolution(solution);
+
+            //Solution solution1=Solution_to_airland1();
+            //viability_verifier(aircrafts,solution1);
+
             file.close();
         }
         else
