@@ -5,9 +5,9 @@
 
 struct Solution
 {
-    vector<int> aircraft_sequence;
-    vector<int> landing_times;
-    float total_penalty;
+    // Vetor de pares (indice da aeronave, tempo de pouso)
+    vector<pair<int, int>> aircraft_sequence;
+    size_t objective_function = 0;
 };
 
 #endif // SOLUTION_STRUCT_HPP

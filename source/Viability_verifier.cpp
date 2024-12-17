@@ -16,11 +16,10 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
 
     for (size_t i=0; i<num_aircrafts; i++)
     {
-        int current_aircraft_id=solution.aircraft_sequence[i];
-        int current_aircraft_index=current_aircraft_id-1;
-        int solution_time=solution.landing_times[i];
-        int current_aircraft_earliest_time=aircrafts[current_aircraft_index].earliest_time;
-        int current_aircraft_latest_time=aircrafts[current_aircraft_index].latest_time;
+        int current_aircraft_id=solution.aircraft_sequence[i].first;
+        int solution_time=solution.aircraft_sequence[i].second;
+        int current_aircraft_earliest_time=aircrafts[current_aircraft_id].earliest_time;
+        int current_aircraft_latest_time=aircrafts[current_aircraft_id].latest_time;
         
         //Se o tempo de solução for menor que o possível
         if(solution_time<current_aircraft_earliest_time)
@@ -49,10 +48,10 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         //Se o tempo de solução não atender ao tempo de separação da aeronave anterior
         if(i!=0)
         {
-            int previous_aircraft_id=solution.aircraft_sequence[i-1];
+            int previous_aircraft_id=solution.aircraft_sequence[i-1].first;
             int previous_aircraft_index=previous_aircraft_id-1;
-            int previous_aircraft_solution_time=solution.landing_times[i-1];
-            int separation_time=aircrafts[current_aircraft_index].separation_times[previous_aircraft_index];
+            int previous_aircraft_solution_time=solution.aircraft_sequence[i-1].second;
+            int separation_time=aircrafts[current_aircraft_id].separation_times[previous_aircraft_index];
 
             if(previous_aircraft_solution_time+separation_time>solution_time)
             {
@@ -77,13 +76,4 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
     }
 
     cout << "\n-------------------------------------------------------------------" << endl;
-}
-
-Solution Solution_to_airland1()
-{
-    Solution solution;
-    solution.aircraft_sequence={3,4,5,1,8,6,7,9,10,2};
-    solution.landing_times={80,521,555,559,573,576,577,591,657,774};
-    solution.total_penalty=0;
-     return solution;
 }

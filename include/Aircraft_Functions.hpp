@@ -6,6 +6,6 @@
 
 void readInstance(ifstream &instance, vector<Aircraft> &aircrafts);
 void printAircrafts(vector<Aircraft> &aircrafts);
-void verifySeparationConstraint(Aircraft i, Aircraft j);
+void sortAircraftsbyTargetTime(vector<Aircraft> &aircrafts);
 
 #endif // AIRCRAFT_FUNCTIONS_HPP

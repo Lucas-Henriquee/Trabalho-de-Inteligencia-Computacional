@@ -18,6 +18,8 @@ void readInstance(ifstream &instance, vector<Aircraft> &aircrafts)
     {
         Aircraft aircraft;
 
+        aircraft.plane_index = i;
+
         if (getline(instance, line))
         {
             istringstream iss(line);
@@ -46,7 +48,7 @@ void printAircrafts(vector<Aircraft> &aircrafts)
     cout << "Dados das " << aircrafts.size() << " aeronaves:\n\n";
     for (size_t i = 0; i < aircrafts.size(); i++)
     {
-        cout << "Aircraft " << i + 1 << endl;
+        cout << "Aircraft " << aircrafts[i].plane_index + 1 << endl;
         cout << "Appearance Time: " << aircrafts[i].appearance_time;
         cout << "\t Earliest Time: " << aircrafts[i].earliest_time;
         cout << "\t Target Time: " << aircrafts[i].target_time;
@@ -62,45 +64,7 @@ void printAircrafts(vector<Aircraft> &aircrafts)
     }
 }
 
-//Prototipo de funcao q verifica a ordem de pouso de um par de avioes
-void verifySeparationConstraint(Aircraft i, Aircraft j)
+void sortAircraftsbyTargetTime(vector<Aircraft> &aircrafts)
 {
-    int i_plane_index=i.plane_index;
-    int j_plane_index=j.plane_index;
-    int ijSeparationTime=j.separation_times[i_plane_index];
-    int jiSeparationTime=i.separation_times[j_plane_index];
-
-    if(i.latest_time<j.earliest_time)
-    {
-        if(i.latest_time+ijSeparationTime<=j.earliest_time)
-        {
-            //i sempre vai pousar antes de j e condição de separacão é
-            //satisfeita automaticamente
-        }
-
-        if(i.latest_time+ijSeparationTime>j.earliest_time)
-        {
-            //i sempre vai pousar antes de j mas condição de separação
-            //deve ser verificada
-        }
-    }
-    if(j.latest_time<i.earliest_time)
-    {
-        if(j.latest_time+jiSeparationTime<=i.earliest_time)
-        {
-            //j sempre vai pousar antes de i e condição de separacão é
-            //satisfeita automaticamente
-        }
-
-        if(j.latest_time+jiSeparationTime>i.earliest_time)
-        {
-            //j sempre vai pousar antes de i mas condição de separação
-            //deve ser verificada
-        }
-    }
-    else
-    {
-        //A ordem de pouso de i e j é incerta
-    }
-
+    sort(aircrafts.begin(), aircrafts.end(), [](Aircraft a, Aircraft b) { return a.target_time < b.target_time; });
 }
