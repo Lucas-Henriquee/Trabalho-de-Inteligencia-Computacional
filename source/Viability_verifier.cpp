@@ -26,7 +26,7 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         {
             //cout<<"i="<<i<<endl;
             //cout<<"id="<<current_aircraft_id<<endl;
-            cout<<"Tempo da aeronave "<<current_aircraft_id<<" definido mais cedo que o possivel"<<endl;
+            cout<<"Tempo da aeronave "<<current_aircraft_id+1<<" definido mais cedo que o possivel"<<endl;
             cout<<"Tempo minimo: "<<current_aircraft_earliest_time<<endl;
             cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
 
@@ -38,7 +38,7 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         {
             //cout<<"i="<<i<<endl;
             //cout<<"id="<<current_aircraft_id<<endl;
-            cout<<"Tempo da aeronave "<<current_aircraft_id<<" definido mais tarde que o possivel"<<endl;
+            cout<<"Tempo da aeronave "<<current_aircraft_id+1<<" definido mais tarde que o possivel"<<endl;
             cout<<"Tempo maximo: "<<current_aircraft_latest_time<<endl;
             cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
             
@@ -49,9 +49,8 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         if(i!=0)
         {
             int previous_aircraft_id=solution.aircraft_sequence[i-1].first;
-            int previous_aircraft_index=previous_aircraft_id-1;
             int previous_aircraft_solution_time=solution.aircraft_sequence[i-1].second;
-            int separation_time=aircrafts[current_aircraft_id-1].separation_times[previous_aircraft_index];
+            int separation_time=aircrafts[current_aircraft_id-1].separation_times[previous_aircraft_id];
 
             if(previous_aircraft_solution_time+separation_time>solution_time)
             {
@@ -59,11 +58,11 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
                 // cout<<"current id="<<current_aircraft_id<<endl;
                 // cout<<"i-1="<<i-1<<endl;
                 // cout<<"previous id="<<previous_aircraft_id<<endl;
-                cout<<"Tempo da aeronave "<<current_aircraft_id<<" nao respeita o tempo de separacao da aeronave anterior " <<previous_aircraft_id<<endl;
-                cout<<"Tempo da aeronave "<<previous_aircraft_id<<": "<<previous_aircraft_solution_time<<endl;
+                cout<<"Tempo da aeronave "<<current_aircraft_id+1<<" nao respeita o tempo de separacao da aeronave anterior " <<previous_aircraft_id+1<<endl;
+                cout<<"Tempo da aeronave "<<previous_aircraft_id+1<<": "<<previous_aircraft_solution_time<<endl;
                 cout<<"Tempo de separacao: "<<separation_time<<endl;
-                cout<<"Tempo da aeronave "<<current_aircraft_id<<" : "<<solution_time<<endl;
-                cout<<"Aeronave "<<current_aircraft_id<<" esta antecipada em "<<previous_aircraft_solution_time+separation_time-solution_time<<endl<<endl;
+                cout<<"Tempo da aeronave "<<current_aircraft_id+1<<" : "<<solution_time<<endl;
+                cout<<"Aeronave "<<current_aircraft_id+1<<" esta antecipada em "<<previous_aircraft_solution_time+separation_time-solution_time<<endl<<endl;
                 
                 error_counter++;
             }
