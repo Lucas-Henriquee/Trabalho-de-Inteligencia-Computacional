@@ -36,6 +36,8 @@ all: $(TARGET)
 # Target for creating executable
 $(TARGET): $(OBJS) $(MAIN_OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(MAIN_OBJ) -o $(TARGET)
+	chmod +x $(EXEC)
+	./$(EXEC)
 
 # Rule for object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
@@ -50,3 +52,4 @@ $(BUILD_DIR)/main.o: main.cpp $(DEPS)
 # Clean target
 clean:
 	@$(RM_CMD)
+	chmod -x $(EXEC)

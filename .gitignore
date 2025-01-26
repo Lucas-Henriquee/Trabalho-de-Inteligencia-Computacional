@@ -1,3 +1,4 @@
 /.vscode/*
 /build/*
 aircraft_manager*
+execAll.sh
