@@ -1,10 +1,10 @@
-const planes = Array.from({ length: 12 }, (_, i) => ({
-    id: i + 1,
-    appearance_time: Math.floor(Math.random() * 30),
-    target_time: Math.floor(Math.random() * 30) + 20
-}));
-
-planes.sort(() => Math.random() - 0.5);
+const planes = Array.from({ length: 12 }, (_, i) => i + 1)
+    .sort(() => Math.random() - 0.5) 
+    .map((id, index) => ({
+        id,
+        initial_delay: index * 1.5 + Math.random() * 2, 
+        target_time: Math.floor(Math.random() * 30) + 20
+    }));
 
 let timer = 0;
 let timerInterval;
@@ -30,7 +30,7 @@ function moveHorizontallyWithinRunway(planeElem, callback) {
     let direction = 2;
 
     const interval = setInterval(() => {
-        posX += direction * 2.2; 
+        posX += direction * 2.75;
         if (posX >= runway.offsetLeft + runway.offsetWidth - 60 || posX <= runway.offsetLeft) {
             direction *= -1;
         }
@@ -39,14 +39,14 @@ function moveHorizontallyWithinRunway(planeElem, callback) {
         if (callback && callback()) {
             clearInterval(interval);
         }
-    }, 15);
+    }, 12); 
 }
 
 function moveToRunway(planeElem, runwayX, runwayY, callback) {
     let posX = parseInt(planeElem.style.left) || 0;
     let posY = parseInt(planeElem.style.top) || 0;
-    const stepX = (runwayX - posX) / 200; 
-    const stepY = (runwayY - posY) / 200;
+    const stepX = (runwayX - posX) / 160; 
+    const stepY = (runwayY - posY) / 160;
 
     const interval = setInterval(() => {
         posX += stepX;
@@ -58,12 +58,12 @@ function moveToRunway(planeElem, runwayX, runwayY, callback) {
             clearInterval(interval);
             callback();
         }
-    }, 15);
+    }, 12); 
 }
 
 function moveAlongRunway(planeElem, runwayEndX, callback) {
     let posX = parseInt(planeElem.style.left) || 0;
-    const stepX = 4.5; 
+    const stepX = 5.625; 
     const interval = setInterval(() => {
         posX += stepX;
         planeElem.style.left = posX + 'px';
@@ -77,12 +77,11 @@ function moveAlongRunway(planeElem, runwayEndX, callback) {
                 if (landingCount === planes.length) {
                     showMessage();
                 }
-                callback(); 
-            }, 2000); 
+                callback();
+            }, 1600);
         }
-    }, 20); 
+    }, 16); 
 }
-
 
 function showMessage() {
     clearInterval(timerInterval);
@@ -97,10 +96,9 @@ function showMessage() {
     document.body.appendChild(messageDiv);
 }
 
-
 function runSimulation() {
     const runwayStartX = runway.offsetLeft;
-    const runwayMiddleX = runway.offsetLeft + runway.offsetWidth / 2 - 50; 
+    const runwayMiddleX = runway.offsetLeft + runway.offsetWidth / 2 - 50;
     const runwayY = runway.offsetTop + 20;
     const runwayEndX = runway.offsetLeft + runway.offsetWidth - 50;
     let waitingPlanes = 0;
@@ -131,13 +129,13 @@ function runSimulation() {
                             moveAlongRunway(planeElem, runwayEndX, () => {
                                 runwayClear = true;
                             });
-                        }, 1000); 
+                        }, 800);
                     });
                     return true;
                 }
                 return false;
             });
-        }, plane.appearance_time * 1000 + index * 3000);
+        }, plane.initial_delay * 1000); 
     });
 
     timer = 0;

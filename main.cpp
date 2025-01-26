@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 {
 
     // argv[1] arquivo de entrada
+    // argv[2] quantidade de pistas (em breve será implemtada :) )
 
     if (argc != 0)
     {
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
         {
             vector<Aircraft> aircrafts;
             readInstance(file, aircrafts);
-            printAircrafts(aircrafts);
+            //printAircrafts(aircrafts);
 
             //Testar solução
             Solution solution;
