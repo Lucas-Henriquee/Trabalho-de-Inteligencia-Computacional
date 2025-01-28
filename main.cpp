@@ -29,7 +29,8 @@ int main(int argc, char *argv[])
             constructInitialSolution(aircrafts, solution);
             viability_verifier(aircrafts, solution);
             calculateObjectiveFunction(aircrafts, solution);
-            printSolution(solution);
+            cout << "Função objetivo: " << solution.objective_function << endl<<endl;
+            //printSolution(solution);
 
             file.close();
         }

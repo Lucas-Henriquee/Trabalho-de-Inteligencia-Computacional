@@ -7,8 +7,8 @@
 //A testar
 void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
 {
-    cout<<"Verificador de viabilidade da solucao:"<<endl;
-    cout << "\n-------------------------------------------------------------------" << endl;
+    //cout<<"Verificador de viabilidade da solucao:"<<endl;
+    //cout << "\n-------------------------------------------------------------------" << endl;
 
     size_t error_counter=0;
 
@@ -26,9 +26,9 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         {
             // cout<<"i="<<i<<endl;
             // cout<<"id="<<current_aircraft_id<<endl;
-            cout<<"Tempo da aeronave "<<current_aircraft_id+1<<" definido mais cedo que o possivel"<<endl;
-            cout<<"Tempo minimo: "<<current_aircraft_earliest_time<<endl;
-            cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
+            // cout<<"Tempo da aeronave "<<current_aircraft_id+1<<" definido mais cedo que o possivel"<<endl;
+            // cout<<"Tempo minimo: "<<current_aircraft_earliest_time<<endl;
+            // cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
 
             error_counter++;
         }
@@ -38,9 +38,9 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         {
             // cout<<"i="<<i<<endl;
             // cout<<"id="<<current_aircraft_id<<endl;
-            cout<<"Tempo da aeronave "<<current_aircraft_id<<" definido mais tarde que o possivel"<<endl;
-            cout<<"Tempo maximo: "<<current_aircraft_latest_time<<endl;
-            cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
+            // cout<<"Tempo da aeronave "<<current_aircraft_id<<" definido mais tarde que o possivel"<<endl;
+            // cout<<"Tempo maximo: "<<current_aircraft_latest_time<<endl;
+            // cout<<"Tempo encontrado: "<<solution_time<<endl<<endl;
             
             error_counter++;
         }
@@ -58,11 +58,11 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
                 // cout<<"current id="<<current_aircraft_id<<endl;
                 // cout<<"i-1="<<i-1<<endl;
                 // cout<<"previous id="<<previous_aircraft_id<<endl;
-                cout<<"Tempo da aeronave "<<current_aircraft_id<<" nao respeita o tempo de separacao da aeronave anterior " <<previous_aircraft_id<<endl;
-                cout<<"Tempo da aeronave "<<previous_aircraft_id<<": "<<previous_aircraft_solution_time<<endl;
-                cout<<"Tempo de separacao: "<<separation_time<<endl;
-                cout<<"Tempo da aeronave "<<current_aircraft_id<<" : "<<solution_time<<endl;
-                cout<<"Aeronave "<<current_aircraft_id+1<<" esta antecipada em "<<previous_aircraft_solution_time+separation_time-solution_time<<endl<<endl;
+                // cout<<"Tempo da aeronave "<<current_aircraft_id<<" nao respeita o tempo de separacao da aeronave anterior " <<previous_aircraft_id<<endl;
+                // cout<<"Tempo da aeronave "<<previous_aircraft_id<<": "<<previous_aircraft_solution_time<<endl;
+                // cout<<"Tempo de separacao: "<<separation_time<<endl;
+                // cout<<"Tempo da aeronave "<<current_aircraft_id<<" : "<<solution_time<<endl;
+                // cout<<"Aeronave "<<current_aircraft_id+1<<" esta antecipada em "<<previous_aircraft_solution_time+separation_time-solution_time<<endl<<endl;
                 
                 error_counter++;
             }
@@ -73,8 +73,12 @@ void viability_verifier(vector<Aircraft> aircrafts, Solution solution)
     {
         cout<<"Solucao viavel"<<endl;
     }
+    else
+    {
+        cout<<"Solucao inviavel"<<endl;
+    }
 
-    cout << "\n-------------------------------------------------------------------" << endl;
+    // cout << "\n-------------------------------------------------------------------" << endl;
 }
 
 Solution Solution_to_airland1()

@@ -64,11 +64,11 @@ void printAircrafts(vector<Aircraft> &aircrafts)
     }
 }
 
-void sortAircraftsbyTargetTime(vector<Aircraft> &aircrafts)
+void sortAircraftsbyEarliestTime(vector<Aircraft> &aircrafts)
 {
     // Sort aircrafts by target_time
     sort(aircrafts.begin(), aircrafts.end(), [](const Aircraft &a, const Aircraft &b) {
-        return a.target_time < b.target_time;
+        return a.earliest_time < b.earliest_time;
     });
 
     // Reassign separate times to match the new order

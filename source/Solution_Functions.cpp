@@ -42,12 +42,12 @@ void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution)
 {
     size_t num_aircrafts=aircrafts.size();
 
-    sortAircraftsbyTargetTime(aircrafts);
+    sortAircraftsbyEarliestTime(aircrafts);
 
     solution.aircraft_sequence.push_back(make_pair(aircrafts[0].plane_index,aircrafts[0].target_time));
 
     for (size_t i = 1; i < num_aircrafts; i++)
     {
-        solution.aircraft_sequence.push_back(make_pair(aircrafts[i].plane_index, max(aircrafts[i].target_time, (solution.aircraft_sequence[i-1].second + aircrafts[i].separation_times[i-1]))));
+        solution.aircraft_sequence.push_back(make_pair(aircrafts[i].plane_index, max(aircrafts[i].earliest_time, (solution.aircraft_sequence[i-1].second + aircrafts[i].separation_times[i-1]))));
     }
 }
