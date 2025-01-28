@@ -6,6 +6,6 @@
 
 void readInstance(ifstream &instance, vector<Aircraft> &aircrafts);
 void printAircrafts(vector<Aircraft> &aircrafts);
-void sortAircraftsbyTargetTime(vector<Aircraft> &aircrafts);
+void sortAircraftsbyEarliestTime(vector<Aircraft> &aircrafts);
 
 #endif // AIRCRAFT_FUNCTIONS_HPP

@@ -73,6 +73,10 @@ bool viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         cout<<"Solucao viavel"<<endl;
         return true;
     }
+    else
+    {
+        cout<<"Solucao inviavel"<<endl;
+    }
 
     // cout << "\n-------------------------------------------------------------------" << endl;
     return false;
