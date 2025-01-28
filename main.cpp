@@ -4,6 +4,7 @@
 #include "include/Solution_Struct.hpp"
 #include "include/Solution_Functions.hpp"
 #include "include/Viability_Verifier.hpp"
+#include "include/Heuristics_Functions.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -24,12 +25,14 @@ int main(int argc, char *argv[])
             readInstance(file, aircrafts);
             //printAircrafts(aircrafts);
 
-            //Testar solução
-            Solution solution;
-            constructInitialSolution(aircrafts, solution);
-            viability_verifier(aircrafts, solution);
-            calculateObjectiveFunction(aircrafts, solution);
-            printSolution(solution);
+            Solution constructive_solution = runConstructiveHeuristic(aircrafts);
+
+            Solution ils_solution = runILS(aircrafts, constructive_solution, 1000);
+
+            Solution ils_rvnd_solution = runILSWithRVND(aircrafts, constructive_solution, 1000, 50);
+
+            printSolution(constructive_solution, ils_solution, ils_rvnd_solution);
+
 
             file.close();
         }

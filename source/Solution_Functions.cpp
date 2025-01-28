@@ -3,24 +3,20 @@
 #include "../include/Solution_Functions.hpp"
 #include "../include/Aircraft_Struct.hpp"
 #include "../include/Aircraft_Functions.hpp"
+#include "../include/Viability_Verifier.hpp"
 #include <unistd.h>
 
-
-void printSolution(Solution solution)
+void printSolution(Solution &constructive, Solution &ils, Solution &ils_rvnd)
 {
-      size_t num_aircrafts=solution.aircraft_sequence.size();
-      cout<<"Solucao da instancia com "<<num_aircrafts<<" aeronaves:"<<endl<<endl;
-      cout<<"Indice da aeronave / tempo de pouso: "<<endl;
-      for (size_t i = 0; i < num_aircrafts; i++)
-      {
-          cout<<solution.aircraft_sequence[i].first + 1<<" / ";
-          cout<<solution.aircraft_sequence[i].second<<endl;
-      }
-      cout<< "Funcao objetivo: " << solution.objective_function << endl;
-      cout<<endl<<endl;
+    cout << "----------------------------------" << endl;
+    cout << "Função Objetivo:" << endl;
+    cout << "Heurística Construtiva: " << constructive.objective_function << endl;
+    cout << "ILS: " << ils.objective_function << endl;
+    cout << "ILS com RVND: " << ils_rvnd.objective_function << endl;
+    cout << "----------------------------------" << endl;
 }
 
-void calculateObjectiveFunction(vector<Aircraft> aircrafts, Solution &solution)
+size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
 {
     size_t num_aircrafts=solution.aircraft_sequence.size();
     size_t objective_function=0;
@@ -35,7 +31,8 @@ void calculateObjectiveFunction(vector<Aircraft> aircrafts, Solution &solution)
         else
             objective_function+=difference * aircrafts[aircraft_index].penalty_before;
     }
-    solution.objective_function=objective_function;
+
+    return objective_function;
 }
 
 void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution)
@@ -50,4 +47,11 @@ void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution)
     {
         solution.aircraft_sequence.push_back(make_pair(aircrafts[i].plane_index, max(aircrafts[i].target_time, (solution.aircraft_sequence[i-1].second + aircrafts[i].separation_times[i-1]))));
     }
+
+    updateObjectiveFunction(aircrafts, solution);
+}
+
+void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
+{
+    solution.objective_function = calculateObjectiveFunction(aircrafts, solution);
 }

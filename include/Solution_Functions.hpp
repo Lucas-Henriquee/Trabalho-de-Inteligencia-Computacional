@@ -5,8 +5,10 @@
 #include "Solution_Struct.hpp"
 #include "Aircraft_Struct.hpp"
 
-void printSolution(Solution solution);
+void printSolution(Solution &constructive, Solution &ils, Solution &ils_rvnd);
 void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution);
-void calculateObjectiveFunction(vector<Aircraft> aircrafts, Solution &solution);
+size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution);
+void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution);
+
 
 #endif // SOLUTION_FUNCTIONS_HPP
