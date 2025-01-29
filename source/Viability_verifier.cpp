@@ -15,7 +15,7 @@ bool viability_verifier(vector<Aircraft> aircrafts, Solution solution)
 
     for (size_t i=0; i<num_aircrafts; i++)
     {
-        int current_aircraft_id=solution.aircraft_sequence[i].first;
+        int current_aircraft_id=solution.aircraft_sequence[i].first.plane_index;
         int solution_time=solution.aircraft_sequence[i].second;
         int current_aircraft_earliest_time=aircrafts[current_aircraft_id].earliest_time;
         int current_aircraft_latest_time=aircrafts[current_aircraft_id].latest_time;
@@ -47,7 +47,7 @@ bool viability_verifier(vector<Aircraft> aircrafts, Solution solution)
         //Se o tempo de solução não atender ao tempo de separação da aeronave anterior
         if(i!=0)
         {
-            int previous_aircraft_id=solution.aircraft_sequence[i-1].first;
+            int previous_aircraft_id=solution.aircraft_sequence[i-1].first.plane_index;
             int previous_aircraft_solution_time=solution.aircraft_sequence[i-1].second;
             int separation_time=aircrafts[current_aircraft_id].separation_times[previous_aircraft_id];
 
@@ -70,22 +70,9 @@ bool viability_verifier(vector<Aircraft> aircrafts, Solution solution)
 
     if(error_counter==0)
     {
-        cout<<"Solucao viavel"<<endl;
         return true;
-    }
-    else
-    {
-        cout<<"Solucao inviavel"<<endl;
     }
 
     // cout << "\n-------------------------------------------------------------------" << endl;
     return false;
-}
-
-Solution Solution_to_airland1()
-{
-    Solution solution;
-    solution.aircraft_sequence={{2,80},{3,521},{4,555},{0,559},{7,573},{5,576},{6,577},{8,591},{9,657},{1,774}};
-    solution.objective_function=0;
-     return solution;
 }

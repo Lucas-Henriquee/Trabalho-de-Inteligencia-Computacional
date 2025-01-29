@@ -29,10 +29,12 @@ int main(int argc, char *argv[])
 
             Solution ils_solution = runILS(aircrafts, constructive_solution, 1000);
 
-            Solution ils_rvnd_solution = runILSWithRVND(aircrafts, constructive_solution, 1000, 50);
+            // Solution ils_rvnd_solution = runILSWithRVND(aircrafts, constructive_solution, 1000, 50);
+            Solution ils_rvnd_solution;
+
+            // printSolution(constructive_solution, ils_solution, ils_rvnd_solution);
 
             printSolution(constructive_solution, ils_solution, ils_rvnd_solution);
-
 
             file.close();
         }

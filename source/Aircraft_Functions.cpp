@@ -79,3 +79,15 @@ void sortAircraftsbyEarliestTime(vector<Aircraft> &aircrafts)
         aircrafts[i].separation_times = new_separation_times;
     }
 }
+
+size_t findAircraftIndex(vector<Aircraft> aircrafts, Aircraft aircraft)
+{
+    for (size_t i = 0; i < aircrafts.size(); i++)
+    {
+        if (aircrafts[i].plane_index == aircraft.plane_index)
+        {
+            return i;
+        }
+    }
+    return -1;
+}

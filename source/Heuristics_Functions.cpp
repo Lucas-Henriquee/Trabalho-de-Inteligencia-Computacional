@@ -5,8 +5,9 @@
 #include "../include/Solution_Functions.hpp"
 #include "../include/Viability_Verifier.hpp"
 #include "../include/defines.hpp"
+#include <typeinfo>
 
-Solution runConstructiveHeuristic(vector<Aircraft> aircrafts)
+Solution runConstructiveHeuristic(vector<Aircraft> &aircrafts)
 {
     Solution solution;
 
@@ -20,22 +21,27 @@ Solution runConstructiveHeuristic(vector<Aircraft> aircrafts)
     return solution;
 }
 
-Solution runILS(vector<Aircraft> aircrafts, Solution solution, int max_iterations)
+Solution runILS(vector<Aircraft> aircrafts, Solution &solution, int max_iterations)
 {
     for (int i = 0; i < max_iterations; i++)
     {
         Solution perturbed_solution = solution;
 
-        // Aplica uma perturbação para sair de ótimos locais
+        // cout << "Antes da perturbação: " << calculateObjectiveFunction(aircrafts, solution) << endl;
         applyPerturbation(aircrafts, perturbed_solution);
+        // cout << "Depois da perturbação: " << calculateObjectiveFunction(aircrafts, solution) << endl;
 
-        // Aplica busca local padrao com RVND
+        // size_t old_cost = solution.objective_function;
         applyShiftLocalSearch(aircrafts, perturbed_solution);
+        // cout << "Antes da busca local: " << old_cost << ", Depois: " << solution.objective_function << endl;
+
 
         // Aceita a nova solução se for melhor
         if (calculateObjectiveFunction(aircrafts, perturbed_solution) < calculateObjectiveFunction(aircrafts, solution))
         {
             i = 0;
+            cout<<"Novo Custo: "<<calculateObjectiveFunction(aircrafts, perturbed_solution)<<endl;
+            cout<<"Custo Antigo: "<<calculateObjectiveFunction(aircrafts, solution)<<endl;
             solution = perturbed_solution;
         }
     }
@@ -43,7 +49,7 @@ Solution runILS(vector<Aircraft> aircrafts, Solution solution, int max_iteration
     return solution;
 }
 
-void applyLocalSearch(vector<Aircraft> aircrafts, Solution &solution)
+void applyLocalSearch(vector<Aircraft> &aircrafts, Solution &solution)
 {
     vector<pair<function<bool(vector<Aircraft> &, Solution &)>, int>> neighborhoods = {
         {shiftNeighborhood, 0},
@@ -86,50 +92,71 @@ void applyLocalSearch(vector<Aircraft> aircrafts, Solution &solution)
     }
 }
 
-void applyShiftLocalSearch(vector<Aircraft> aircrafts, Solution &solution)
+void applyShiftLocalSearch(vector<Aircraft> &aircrafts, Solution &solution)
 {
-    bool improved = true;
-
-    while (improved)
+    bool improved = false;
+    for (size_t i = 0; i < solution.aircraft_sequence.size(); ++i)
     {
-        improved = false;
-        for (size_t i = 0; i < solution.aircraft_sequence.size(); ++i)
+        auto aircraft = solution.aircraft_sequence[i];
+        size_t aircraft_position = findAircraftIndex(aircrafts, aircraft.first) ;
+        auto aircraft_land_time = aircraft.second;
+
+        for (size_t j = 0; j < solution.aircraft_sequence.size(); ++j)
         {
-            auto aircraft = solution.aircraft_sequence[i];
-
-            for (size_t j = 0; j < solution.aircraft_sequence.size(); ++j)
+            if (i != j)
             {
-                if (i != j)
+                // Remove a aeronave da posição original
+                solution.aircraft_sequence.erase(solution.aircraft_sequence.begin() + i);
+
+                if(j == 0)
                 {
-                    // Remove a aeronave da posição original
-                    solution.aircraft_sequence.erase(solution.aircraft_sequence.begin() + i);
+                    aircraft_land_time = max(0, aircrafts[aircraft_position].earliest_time);
+                    solution.aircraft_sequence.insert(solution.aircraft_sequence.begin(), make_pair(aircrafts[aircraft_position], aircraft_land_time));     
+                }
+                else{
+                    aircraft_land_time = max(aircrafts[aircraft_position].earliest_time, solution.aircraft_sequence[j-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[j-1].first) ].separation_times[aircraft_position]);
+                    solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + j, make_pair(aircrafts[aircraft_position], aircraft_land_time));
+                }
+                for(size_t k = j + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
 
-                    // Insere na nova posição
-                    solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + j, aircraft);
-
-                    if (viability_verifier(aircrafts, solution))
+                if (viability_verifier(aircrafts, solution))
+                {
+                    double new_obj = calculateObjectiveFunction(aircrafts, solution);
+                    if (new_obj < solution.objective_function)
                     {
-                        double new_obj = calculateObjectiveFunction(aircrafts, solution);
-                        if (new_obj < solution.objective_function)
-                        {
-                            solution.objective_function = new_obj;
-                            improved = true;
-                            break;
-                        }
+                        solution.objective_function = new_obj;
+                        improved = true;
+                        break;
                     }
+                }
 
-                    // Reverte caso a solução não seja viável
-                    solution.aircraft_sequence.erase(solution.aircraft_sequence.begin() + j);
-                    solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + i, aircraft);
+                // Reverte caso a solução não seja viável
+                solution.aircraft_sequence.erase(solution.aircraft_sequence.begin() + j);
+
+                if(i == 0)
+                {
+                    aircraft_land_time = max(0, aircrafts[aircraft_position].earliest_time);
+                    solution.aircraft_sequence.insert(solution.aircraft_sequence.begin(), make_pair(aircrafts[aircraft_position], aircraft_land_time));     
+                }
+                else{
+                    aircraft_land_time = max(aircrafts[aircraft_position].earliest_time, solution.aircraft_sequence[i-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[i-1].first) ].separation_times[aircraft_position]);
+                    solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + i, make_pair(aircrafts[aircraft_position], aircraft_land_time));
+                }
+                for(size_t k = i + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
                 }
             }
-            if (improved)
-                break;
         }
+        if (improved)
+            break;
     }
 }
 
-Solution runILSWithRVND(vector<Aircraft> aircrafts, Solution initial_solution, int max_iterations, int max_ils_iterations)
+Solution runILSWithRVND(vector<Aircraft> &aircrafts, Solution &initial_solution, int max_iterations, int max_ils_iterations)
 {
     Solution best_solution = initial_solution;
     Solution current_solution = initial_solution;
@@ -171,7 +198,7 @@ void applyPerturbation(vector<Aircraft> &aircrafts, Solution &solution)
 
     if (solution.aircraft_sequence.size() > 1)
     {
-        for (int k = 0; k < 5; ++k) // Número de trocas aleatórias
+        for (int k = 0; k < 100; ++k) // Número de trocas aleatórias
         {
 
             int idx2 = rand() % solution.aircraft_sequence.size();
@@ -182,16 +209,70 @@ void applyPerturbation(vector<Aircraft> &aircrafts, Solution &solution)
                 k--;
                 continue;
             }
-                
-            swap(solution.aircraft_sequence[idx1], solution.aircraft_sequence[idx2]);
+            auto aircraft1 = solution.aircraft_sequence[idx1];
+            auto aircraft2 = solution.aircraft_sequence[idx2];
+            solution.aircraft_sequence.erase(solution.aircraft_sequence.begin() + idx1);
+            solution.aircraft_sequence.erase(solution.aircraft_sequence.begin() + idx2);
+            if(idx1 == 0)
+            {
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin(), make_pair(aircraft2.first, max(0, aircrafts[findAircraftIndex(aircrafts, aircraft2.first)].earliest_time)));
+                for(size_t k = 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + idx2, make_pair(aircraft1.first, max(aircrafts[findAircraftIndex(aircrafts, aircraft1.first)].earliest_time, solution.aircraft_sequence[0].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[0].first)].separation_times[findAircraftIndex(aircrafts, aircraft1.first)])));
+                for(size_t k = idx2 + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+            }
+            else if(idx2 == 0)
+            {
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin(), make_pair(aircraft1.first, max(0, aircrafts[findAircraftIndex(aircrafts, aircraft1.first)].earliest_time)));
+                for(size_t k = 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + idx1, make_pair(aircraft2.first, max(aircrafts[findAircraftIndex(aircrafts, aircraft2.first)].earliest_time, solution.aircraft_sequence[0].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[0].first)].separation_times[findAircraftIndex(aircrafts, aircraft2.first)])));
+                for(size_t k = idx1 + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+            }
+            else if(idx1 < idx2)
+            {
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + idx1, make_pair(aircraft2.first, max(aircrafts[findAircraftIndex(aircrafts, aircraft2.first)].earliest_time, solution.aircraft_sequence[idx1 - 1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[idx1 - 1].first)].separation_times[findAircraftIndex(aircrafts, aircraft2.first)])));
+                for(size_t k = idx1 + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + idx2, make_pair(aircraft1.first, max(aircrafts[findAircraftIndex(aircrafts, aircraft1.first)].earliest_time, solution.aircraft_sequence[idx2 - 1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[idx2 - 1].first)].separation_times[findAircraftIndex(aircrafts, aircraft1.first)])));
+                for(size_t k = idx2 + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+            }
+            else
+            {
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + idx2, make_pair(aircraft1.first, max(aircrafts[findAircraftIndex(aircrafts, aircraft1.first)].earliest_time, solution.aircraft_sequence[idx2 - 1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[idx2 - 1].first)].separation_times[findAircraftIndex(aircrafts, aircraft1.first)])));
+                for(size_t k = idx2 + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+                solution.aircraft_sequence.insert(solution.aircraft_sequence.begin() + idx1, make_pair(aircraft2.first, max(aircrafts[findAircraftIndex(aircrafts, aircraft2.first)].earliest_time, solution.aircraft_sequence[idx1 - 1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[idx1 - 1].first)].separation_times[findAircraftIndex(aircrafts, aircraft2.first)])));
+                for(size_t k = idx1 + 1; k < solution.aircraft_sequence.size(); ++k)
+                {
+                    solution.aircraft_sequence[k].second = max(aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first) ].earliest_time, solution.aircraft_sequence[k-1].second + aircrafts[findAircraftIndex(aircrafts, solution.aircraft_sequence[k-1].first) ].separation_times[findAircraftIndex(aircrafts, solution.aircraft_sequence[k].first)]);
+                }
+            }
         }
 
         // Ajusta os tempos de pouso e atualiza a função objetivo
         for (size_t i = 0; i < solution.aircraft_sequence.size(); ++i)
         {
-            int current_aircraft_id = solution.aircraft_sequence[i].first;
+            int current_aircraft_id = solution.aircraft_sequence[i].first.plane_index;
             int previous_time = (i > 0) ? solution.aircraft_sequence[i - 1].second : 0;
-            int separation_time = (i > 0) ? aircrafts[current_aircraft_id].separation_times[solution.aircraft_sequence[i - 1].first] : 0;
+            int separation_time = (i > 0) ? aircrafts[current_aircraft_id].separation_times[solution.aircraft_sequence[i - 1].first.plane_index] : 0;
 
             int scheduled_time = max(solution.aircraft_sequence[i].second, previous_time + separation_time);
             scheduled_time = max(scheduled_time, aircrafts[current_aircraft_id].earliest_time);

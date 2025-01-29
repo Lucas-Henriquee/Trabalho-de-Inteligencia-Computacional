@@ -2,11 +2,12 @@
 #define SOLUTION_STRUCT_HPP
 
 #include "defines.hpp"
+#include "Aircraft_Struct.hpp"
 
 struct Solution
 {
     // Vetor de pares (indice da aeronave, tempo de pouso)
-    vector<pair<int, int>> aircraft_sequence;
+    vector<pair<Aircraft, int>> aircraft_sequence;
     size_t objective_function = 0;
 };
 
