@@ -51,10 +51,12 @@ Solution runILS(vector<Aircraft> aircrafts, Solution &solution, int max_iteratio
 
 void applyLocalSearch(vector<Aircraft> &aircrafts, Solution &solution)
 {
-    vector<pair<function<bool(vector<Aircraft> &, Solution &)>, int>> neighborhoods = {
+    vector<pair<function<bool(vector<Aircraft> &, Solution &)>, int>> neighborhoods = 
+    {
         {shiftNeighborhood, 0},
         {swapNeighborhood, 0},
-        {twoOptNeighborhood, 0}};
+        {twoOptNeighborhood, 0}
+    };
 
     bool improved = true;
 
