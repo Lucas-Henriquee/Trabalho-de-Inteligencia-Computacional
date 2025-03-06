@@ -18,18 +18,21 @@ void printSolution(Solution &constructive, Solution &ils, Solution &ils_rvnd)
 
 size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
 {
-    size_t num_aircrafts=solution.aircraft_sequence.size();
-    size_t objective_function=0;
-    for (size_t i = 0; i < num_aircrafts; i++)
+    size_t objective_function = 0;
+    Node *current = solution.schedule.getHead();
+
+    while (current != nullptr)
     {
-        size_t aircraft_id=solution.aircraft_sequence[i].first.plane_index;
-        size_t aircraft_index=aircraft_id-1;
-        size_t aircraft_time=solution.aircraft_sequence[i].second;
-        int difference = aircrafts[aircraft_index].target_time-aircraft_time;
-        if (difference<0)
-            objective_function+=abs(difference) * aircrafts[aircraft_index].penalty_after;
+        int aircraft_id = current->aircraft.plane_index;
+        int aircraft_time = current->landing_time;
+        int difference = aircrafts[aircraft_id - 1].target_time - aircraft_time;
+
+        if (difference < 0)
+            objective_function += abs(difference) * aircrafts[aircraft_id - 1].penalty_after;
         else
-            objective_function+=difference * aircrafts[aircraft_index].penalty_before;
+            objective_function += difference * aircrafts[aircraft_id - 1].penalty_before;
+
+        current = current->next;
     }
 
     return objective_function;
@@ -37,15 +40,17 @@ size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solutio
 
 void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution)
 {
-    size_t num_aircrafts=aircrafts.size();
-
     sortAircraftsbyEarliestTime(aircrafts);
 
-    solution.aircraft_sequence.push_back(make_pair(aircrafts[0],aircrafts[0].target_time));
+    solution.schedule.push_back(aircrafts[0], aircrafts[0].target_time);
 
-    for (size_t i = 1; i < num_aircrafts; i++)
+    for (size_t i = 1; i < aircrafts.size(); i++)
     {
-        solution.aircraft_sequence.push_back(make_pair(aircrafts[i], max(aircrafts[i].earliest_time, (solution.aircraft_sequence[i-1].second + aircrafts[i].separation_times[i-1]))));
+        int previous_landing_time = solution.schedule.getTail()->landing_time;
+        int separation_time = aircrafts[i].separation_times[aircrafts[i - 1].plane_index];
+        int landing_time = max(aircrafts[i].earliest_time, previous_landing_time + separation_time);
+
+        solution.schedule.push_back(aircrafts[i], landing_time);
     }
 
     updateObjectiveFunction(aircrafts, solution);
@@ -55,4 +60,3 @@ void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
 {
     solution.objective_function = calculateObjectiveFunction(aircrafts, solution);
 }
-

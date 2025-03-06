@@ -3,11 +3,11 @@
 
 #include "defines.hpp"
 #include "Aircraft_Struct.hpp"
+#include "RunwaySchedule.hpp"
 
 struct Solution
 {
-    // Vetor de pares (indice da aeronave, tempo de pouso)
-    vector<pair<Aircraft, int>> aircraft_sequence;
+    RunwaySchedule schedule;
     size_t objective_function = 0;
 };
 

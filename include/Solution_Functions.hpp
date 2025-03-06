@@ -10,5 +10,4 @@ void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution);
 size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution);
 void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution);
 
-
 #endif // SOLUTION_FUNCTIONS_HPP
