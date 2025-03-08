@@ -3,11 +3,11 @@
 
 #include "defines.hpp"
 #include "Aircraft_Struct.hpp"
-#include "RunwaySchedule.hpp"
+#include "Runway_Schedule.hpp"
 
 struct Solution
 {
-    RunwaySchedule schedule;
+    Runway_Schedule schedule;
     size_t objective_function = 0;
 };
 

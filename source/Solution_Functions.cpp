@@ -6,13 +6,11 @@
 #include "../include/Viability_Verifier.hpp"
 #include <unistd.h>
 
-void printSolution(Solution &constructive, Solution &ils, Solution &ils_rvnd)
+void printSolution(Solution &solution)
 {
     cout << "----------------------------------" << endl;
     cout << "Função Objetivo:" << endl;
-    cout << "Heurística Construtiva: " << constructive.objective_function << endl;
-    cout << "ILS: " << ils.objective_function << endl;
-    cout << "ILS com RVND: " << ils_rvnd.objective_function << endl;
+    cout << "Heurística Implementada: " << solution.objective_function << endl;
     cout << "----------------------------------" << endl;
 }
 
@@ -20,6 +18,11 @@ size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solutio
 {
     size_t objective_function = 0;
     Node *current = solution.schedule.getHead();
+
+    bool viable = viability_verifier(aircrafts, solution);
+    if(!viable){
+        return static_cast<size_t>(-1);
+    }
 
     while (current != nullptr)
     {
@@ -38,25 +41,23 @@ size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solutio
     return objective_function;
 }
 
-void constructInitialSolution(vector<Aircraft> aircrafts, Solution &solution)
-{
-    sortAircraftsbyEarliestTime(aircrafts);
-
-    solution.schedule.push_back(aircrafts[0], aircrafts[0].target_time);
-
-    for (size_t i = 1; i < aircrafts.size(); i++)
-    {
-        int previous_landing_time = solution.schedule.getTail()->landing_time;
-        int separation_time = aircrafts[i].separation_times[aircrafts[i - 1].plane_index];
-        int landing_time = max(aircrafts[i].earliest_time, previous_landing_time + separation_time);
-
-        solution.schedule.push_back(aircrafts[i], landing_time);
-    }
-
-    updateObjectiveFunction(aircrafts, solution);
-}
-
 void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
 {
     solution.objective_function = calculateObjectiveFunction(aircrafts, solution);
+}
+
+Solution copySolution(Solution &solution)
+{
+    Solution new_solution;
+    Node *current = solution.schedule.getHead();
+
+    while (current != nullptr)
+    {
+        new_solution.schedule.push_back(current->aircraft, current->landing_time);
+        current = current->next;
+    }
+
+    new_solution.objective_function = solution.objective_function;
+
+    return new_solution;
 }

@@ -7,20 +7,22 @@
 struct Node
 {
     Aircraft aircraft;
-    int landing_time;
     Node *prev;
     Node *next;
+    int landing_time;
 
     Node(Aircraft a, int time) : aircraft(a), landing_time(time), prev(nullptr), next(nullptr) {}
 };
 
-class RunwaySchedule
+class Runway_Schedule
 {
 public:
-    RunwaySchedule() : head(nullptr), tail(nullptr), size(0) {}
-    ~RunwaySchedule();
+    Runway_Schedule() : head(nullptr), tail(nullptr), size(0) {}
+    ~Runway_Schedule();
 
     void push_back(Aircraft aircraft, int landing_time);
+    void insert(Node *node, Aircraft aircraft, int landing_time);
+    void remove(Node *node);
     void print() const;
     
     size_t getSize() const;

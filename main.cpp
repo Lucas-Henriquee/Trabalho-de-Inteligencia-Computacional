@@ -4,7 +4,8 @@
 #include "include/Solution_Struct.hpp"
 #include "include/Solution_Functions.hpp"
 #include "include/Viability_Verifier.hpp"
-#include "include/Heuristics_Functions.hpp"
+#include "include/Search_Strategy.hpp"
+#include "include/Populational_Strategy.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -23,18 +24,12 @@ int main(int argc, char *argv[])
         {
             vector<Aircraft> aircrafts;
             readInstance(file, aircrafts);
-            //printAircrafts(aircrafts);
 
-            Solution constructive_solution = runConstructiveHeuristic(aircrafts);
+            Solution search_solution = Solution();
+            searchStrategy(aircrafts, search_solution);
 
-            Solution ils_solution = runILS(aircrafts, constructive_solution, 1000);
-
-            // Solution ils_rvnd_solution = runILSWithRVND(aircrafts, constructive_solution, 1000, 50);
-            Solution ils_rvnd_solution;
-
-            // printSolution(constructive_solution, ils_solution, ils_rvnd_solution);
-
-            printSolution(constructive_solution, ils_solution, ils_rvnd_solution);
+            Solution populational_solution = Solution();
+            populationalStrategy(aircrafts, populational_solution, 10, 10);
 
             file.close();
         }
