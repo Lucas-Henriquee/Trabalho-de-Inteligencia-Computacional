@@ -8,7 +8,4 @@
 void populationalStrategy(vector<Aircraft> &aircrafts, Solution &solution, size_t population_size, size_t generations);
 void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t population_size, size_t generations);
 
-
-
-
 #endif // POPUlATIONAL_STRATEGY_HPP

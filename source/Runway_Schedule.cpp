@@ -34,8 +34,8 @@ void Runway_Schedule::print() const
     Node *current = head;
     while (current != nullptr)
     {
-        std::cout << "Aircraft " << current->aircraft.plane_index
-                  << " landed at " << std::endl;
+        cout << "Aircraft " << current->aircraft.plane_index
+                  << " landed at " << endl;
         current = current->next;
     }
 }

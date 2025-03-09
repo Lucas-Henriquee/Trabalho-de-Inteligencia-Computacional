@@ -6,6 +6,5 @@
 #include "Aircraft_Struct.hpp"
 
 bool viability_verifier(vector<Aircraft> aircrafts, Solution solution);
-Solution Solution_to_airland1();
 
 #endif // VIABILITY_VERIFIER_HPP

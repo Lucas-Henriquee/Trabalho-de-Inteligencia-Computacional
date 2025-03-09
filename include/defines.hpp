@@ -17,6 +17,7 @@
 #include <cmath>      /* implementação do ceil() */
 #include <iomanip>    /* manipulação de entrada e saída */
 #include <random>    /* implementação de funções de geração de números aleatórios */
+#include <unistd.h>   /* implementação de funções de manipulação de diretórios */
 
 using namespace std;
 

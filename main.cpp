@@ -17,18 +17,23 @@ int main(int argc, char *argv[])
     {
 
         string filename = argv[1];
+        int num_runways = stoi(argv[2]);
 
         ifstream file(filename);
+
 
         if (file.is_open())
         {
             vector<Aircraft> aircrafts;
             readInstance(file, aircrafts);
 
-            Solution search_solution = Solution();
+            Solution constructive_solution(num_runways);
+            constructiveStrategy(aircrafts, constructive_solution);
+
+            Solution search_solution(num_runways);
             searchStrategy(aircrafts, search_solution);
 
-            Solution populational_solution = Solution();
+            Solution populational_solution(num_runways);
             populationalStrategy(aircrafts, populational_solution, 10, 10);
 
             file.close();

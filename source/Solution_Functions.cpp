@@ -4,7 +4,6 @@
 #include "../include/Aircraft_Struct.hpp"
 #include "../include/Aircraft_Functions.hpp"
 #include "../include/Viability_Verifier.hpp"
-#include <unistd.h>
 
 void printSolution(Solution &solution)
 {
@@ -17,25 +16,30 @@ void printSolution(Solution &solution)
 size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
 {
     size_t objective_function = 0;
-    Node *current = solution.schedule.getHead();
 
     bool viable = viability_verifier(aircrafts, solution);
-    if(!viable){
+
+    if (!viable)
         return static_cast<size_t>(-1);
-    }
 
-    while (current != nullptr)
+    for (size_t r = 0; r < solution.schedules.size(); r++) 
     {
-        int aircraft_id = current->aircraft.plane_index;
-        int aircraft_time = current->landing_time;
-        int difference = aircrafts[aircraft_id - 1].target_time - aircraft_time;
+        Node *current = solution.schedules[r].getHead();
 
-        if (difference < 0)
-            objective_function += abs(difference) * aircrafts[aircraft_id - 1].penalty_after;
-        else
-            objective_function += difference * aircrafts[aircraft_id - 1].penalty_before;
+        while (current)
+        {
+            int aircraft_id = current->aircraft.plane_index;
+            int aircraft_time = current->landing_time;
+            int difference = aircrafts[aircraft_id - 1].target_time - aircraft_time;
 
-        current = current->next;
+            if (difference < 0)
+                objective_function += abs(difference) * aircrafts[aircraft_id - 1].penalty_after;
+
+            else
+                objective_function += difference * aircrafts[aircraft_id - 1].penalty_before;
+
+            current = current->next;
+        }
     }
 
     return objective_function;
@@ -48,16 +52,18 @@ void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)
 
 Solution copySolution(Solution &solution)
 {
-    Solution new_solution;
-    Node *current = solution.schedule.getHead();
+    Solution new_solution(solution.num_runways); 
 
-    while (current != nullptr)
+    for (size_t r = 0; r < solution.schedules.size(); r++)
     {
-        new_solution.schedule.push_back(current->aircraft, current->landing_time);
-        current = current->next;
+        Node *current = solution.schedules[r].getHead();
+        while (current != nullptr)
+        {
+            new_solution.schedules[r].push_back(current->aircraft, current->landing_time);
+            current = current->next;
+        }
     }
 
     new_solution.objective_function = solution.objective_function;
-
     return new_solution;
 }
