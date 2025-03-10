@@ -34,6 +34,10 @@ int main(int argc, char *argv[])
             searchStrategy(aircrafts, search_solution);
 
             Solution populational_solution(num_runways);
+            populational_solution.initial_pheromone = 1.0;
+            populational_solution.evaporation_rate = 0.1;
+            populational_solution.pheromone_deposit = 1.0;
+            populational_solution.exploration_rate = 0.1;
             populationalStrategy(aircrafts, populational_solution, 10, 10);
 
             file.close();
