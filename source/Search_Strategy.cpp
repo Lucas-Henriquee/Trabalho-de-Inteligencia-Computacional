@@ -20,6 +20,7 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
     vector<Aircraft> destroyed_aircrafts;
     copy(aircrafts.begin(), aircrafts.end(), back_inserter(destroyed_aircrafts));
     NEHConstructive(destroyed_aircrafts, solution, destroyed_aircrafts);
+    viability_verifier(aircrafts, solution);
     Solution best_solution = copySolution(solution);
     bool improved = false;
     size_t non_improving = 0;
@@ -28,7 +29,6 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
         VND(aircrafts, solution, best_solution);
         if (solution.objective_function < best_solution.objective_function)
         {
-            // TODO: Deletar a melhor solução anterior
             best_solution = copySolution(solution);
             improved = true;
             non_improving = 0;
@@ -45,26 +45,17 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
 
 void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Aircraft> &destroyed_aircrafts)
 {
-    // TODO: Implementar o NEH
     if (destroyed_aircrafts.empty() || solution.schedules.empty())
         return;
 
-    // TODO: Distribuir os aviões entre as pistas de maneira inicial
-    for (size_t i = 0; i < destroyed_aircrafts.size(); i++)
-    {
-        size_t runway_index = i % solution.schedules.size(); // Distribuição balanceada
-        solution.schedules[runway_index].push_back(destroyed_aircrafts[i], destroyed_aircrafts[i].target_time);
-    }
-
     // TODO: Iterar sobre as aeronaves para encontrar a melhor posição em qualquer pista
-    for (size_t i = 1; i < destroyed_aircrafts.size(); i++)
+    for (size_t i = 0; i < destroyed_aircrafts.size(); i++)
     {
         Aircraft aircraft_to_insert = destroyed_aircrafts[i];
         Node *best_position = nullptr;
         size_t best_runway = 0;
-        size_t best_objective = solution.objective_function;
+        size_t best_objective = static_cast<size_t>(-1);
 
-        // TODO: Testar a inserção em todas as pistas e em todas as posições possíveis
         for (size_t r = 0; r < solution.schedules.size(); r++)
         {
             Runway_Schedule &runway = solution.schedules[r];
@@ -76,11 +67,9 @@ void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Air
                 for (size_t k = 0; k < j && current; k++)
                     current = current->next;
 
-                // TODO: Verificar antes de inserir se aquela posição é válida
                 runway.insert(current, aircraft_to_insert, aircraft_to_insert.target_time);
                 updateObjectiveFunction(aircrafts, solution);
 
-                // TODO: Descobrir qual é a melhor posição para o avião através da função objetivo
                 if (solution.objective_function < best_objective)
                 {
                     best_objective = solution.objective_function;
@@ -88,9 +77,8 @@ void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Air
                     best_runway = r;
                 }
 
-                if (current)
+                if (current!=nullptr)
                     runway.remove(current->prev);
-
                 else
                     runway.remove(runway.getTail());
             }

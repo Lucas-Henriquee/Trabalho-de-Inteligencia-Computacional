@@ -81,24 +81,30 @@ void Runway_Schedule::insert(Node *node, Aircraft aircraft, int landing_time)
     Node *newNode = new Node(aircraft, landing_time);
 
     if (node == nullptr){
-        tail->next = newNode;
-        newNode->prev = tail;
-        tail = newNode;
+        if(tail == nullptr)
+            head = tail = newNode;
+        else{
+            tail->next = newNode;
+            newNode->prev = tail;
+            tail = newNode;
+        }
     }
-
-    if (node == head)
-    {
-        newNode->next = head;
-        head->prev = newNode;
-        head = newNode;
+    else{
+        if (node == head)
+        {
+            newNode->next = head;
+            head->prev = newNode;
+            head = newNode;
+        }
+        else
+        {
+            newNode->next = node;
+            newNode->prev = node->prev;
+            node->prev->next = newNode;
+            node->prev = newNode;
+        }
     }
-    else
-    {
-        newNode->next = node;
-        newNode->prev = node->prev;
-        node->prev->next = newNode;
-        node->prev = newNode;
-    }
+    
 
     size++;
 }

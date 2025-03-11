@@ -3,7 +3,6 @@
 #include "include/defines.hpp"
 #include "include/Solution_Struct.hpp"
 #include "include/Solution_Functions.hpp"
-#include "include/Viability_Verifier.hpp"
 #include "include/Search_Strategy.hpp"
 #include "include/Populational_Strategy.hpp"
 

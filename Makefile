@@ -13,7 +13,7 @@ MAIN_OBJ := $(BUILD_DIR)/main.o
 DEPS := $(wildcard $(INC_DIR)/*.hpp)
 
 # Default Compiler flags
-CXXFLAGS := -std=c++17 -Wall -Wextra -I$(INC_DIR)
+CXXFLAGS := -std=c++17 -Wall -Wextra -I$(INC_DIR) -g
 
 # OS-specific settings
 ifeq ($(OS),Windows_NT)

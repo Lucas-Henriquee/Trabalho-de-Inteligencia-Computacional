@@ -12,6 +12,7 @@ struct Node
     int landing_time;
 
     Node(Aircraft a, int time) : aircraft(a), landing_time(time), prev(nullptr), next(nullptr) {}
+    ~Node() {}
 };
 
 class Runway_Schedule

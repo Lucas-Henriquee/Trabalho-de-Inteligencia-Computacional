@@ -4,7 +4,6 @@
 #include "../include/Solution_Struct.hpp"
 #include "../include/Solution_Functions.hpp"
 #include "../include/Runway_Schedule.hpp"
-#include "../include/Viability_Verifier.hpp"
 #include "../include/Populational_Strategy.hpp"
 
 void populationalStrategy(vector<Aircraft> &aircrafts, Solution &solution, size_t population_size, size_t generations)

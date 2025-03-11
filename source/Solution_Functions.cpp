@@ -3,7 +3,6 @@
 #include "../include/Solution_Functions.hpp"
 #include "../include/Aircraft_Struct.hpp"
 #include "../include/Aircraft_Functions.hpp"
-#include "../include/Viability_Verifier.hpp"
 
 void printSolution(Solution &solution)
 {
@@ -30,13 +29,13 @@ size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solutio
         {
             int aircraft_id = current->aircraft.plane_index;
             int aircraft_time = current->landing_time;
-            int difference = aircrafts[aircraft_id - 1].target_time - aircraft_time;
+            int difference = aircrafts[aircraft_id].target_time - aircraft_time;
 
             if (difference < 0)
-                objective_function += abs(difference) * aircrafts[aircraft_id - 1].penalty_after;
+                objective_function += abs(difference) * aircrafts[aircraft_id].penalty_after;
 
             else
-                objective_function += difference * aircrafts[aircraft_id - 1].penalty_before;
+                objective_function += difference * aircrafts[aircraft_id].penalty_before;
 
             current = current->next;
         }
@@ -66,4 +65,38 @@ Solution copySolution(Solution &solution)
 
     new_solution.objective_function = solution.objective_function;
     return new_solution;
+}
+
+bool viability_verifier(vector<Aircraft> &aircrafts, Solution &solution)
+{
+    size_t error_counter = 0;
+
+    for (size_t r = 0; r < solution.schedules.size(); r++) 
+    {
+        Node *current = solution.schedules[r].getHead();
+        while (current != nullptr)
+        {
+            int aircraft_id = current->aircraft.plane_index;
+            int solution_time = current->landing_time;
+            int earliest_time = aircrafts[aircraft_id].earliest_time;
+            int latest_time = aircrafts[aircraft_id].latest_time;
+
+            if (solution_time < earliest_time || solution_time > latest_time)
+                error_counter++;
+
+            if (current->prev != nullptr)
+            {
+                int previous_aircraft_id = current->prev->aircraft.plane_index;
+                int previous_landing_time = current->prev->landing_time;
+                int separation_time = aircrafts[aircraft_id].separation_times[previous_aircraft_id];
+
+                if (previous_landing_time + separation_time > solution_time)
+                    error_counter++;
+            }
+
+            current = current->next;
+        }
+    }
+
+    return (error_counter == 0);
 }
