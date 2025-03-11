@@ -22,10 +22,11 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
     NEHConstructive(destroyed_aircrafts, solution, destroyed_aircrafts);
     viability_verifier(aircrafts, solution);
     Solution best_solution = copySolution(solution);
-    bool improved = false;
+    bool improved;
     size_t non_improving = 0;
     do
     {
+        improved = false;
         VND(aircrafts, solution, best_solution);
         if (solution.objective_function < best_solution.objective_function)
         {
@@ -33,13 +34,12 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
             improved = true;
             non_improving = 0;
         }
+
         destroyed_aircrafts = destroySolution(solution);
-        NEHConstructive(destroyed_aircrafts, solution, destroyed_aircrafts);
-        if (improved)
-        {
-            improved = false;
+
+        NEHConstructive(aircrafts, solution, destroyed_aircrafts);
+        if (!improved)
             non_improving++;
-        }
     } while (non_improving < 100);
 }
 
