@@ -8,6 +8,7 @@
 void constructiveStrategy(vector<Aircraft> &aircrafts, Solution &solution);
 void searchStrategy(vector<Aircraft> &aircrafts, Solution &solution);
 void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Aircraft> &destroyed_aircrafts);
+void scheduleLandingTimes(vector<Aircraft> &aircrafts, Solution &solution);
 void IG(vector<Aircraft> &aircrafts, Solution &solution);
 void VND(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solution);
 bool applySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solution);

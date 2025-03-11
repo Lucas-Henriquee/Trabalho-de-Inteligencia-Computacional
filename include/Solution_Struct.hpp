@@ -10,6 +10,7 @@ struct Solution
     vector<Runway_Schedule> schedules;
     size_t objective_function = 0;
     size_t num_runways = 0;
+    string heuristic = " ";
 
     double initial_pheromone = 1.0;
     double evaporation_rate = 0.1;

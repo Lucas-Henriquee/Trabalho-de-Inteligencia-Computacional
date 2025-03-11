@@ -24,7 +24,7 @@ ifeq ($(OS),Windows_NT)
 else
     MKDIR_CMD = @mkdir -p $(BUILD_DIR)
     RM_CMD = @rm -rf $(BUILD_DIR) $(TARGET)
-    EXEC_CMD = @if [ -f $(EXEC) ]; then ./$(EXEC); else echo "execAll.sh not found. Skipping auto-run."; fi
+    EXEC_CMD = @if [ -f $(EXEC) ]; then chmod +x $(EXEC) && ./$(EXEC); else echo "execAll.sh not found. Skipping auto-run."; fi
 endif
 
 # Output executables

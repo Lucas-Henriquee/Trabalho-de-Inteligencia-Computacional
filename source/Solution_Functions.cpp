@@ -7,7 +7,7 @@
 void printSolution(Solution &solution)
 {
     cout << "----------------------------------" << endl;
-    cout << "Função Objetivo:" << endl;
+    cout << "Função Objetivo: " << solution.heuristic << endl;
     cout << "Heurística Implementada: " << solution.objective_function << endl;
     cout << "----------------------------------" << endl;
 }

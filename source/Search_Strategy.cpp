@@ -5,12 +5,14 @@
 
 void constructiveStrategy(vector<Aircraft> &aircrafts, Solution &solution)
 {
+    solution.heuristic = "NEH";
     NEHConstructive(aircrafts, solution, aircrafts);
     printSolution(solution);
 }
 
 void searchStrategy(vector<Aircraft> &aircrafts, Solution &solution)
 {
+    solution.heuristic = "IG";
     IG(aircrafts, solution);
     printSolution(solution);
 }
@@ -48,47 +50,110 @@ void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Air
     if (destroyed_aircrafts.empty() || solution.schedules.empty())
         return;
 
-    // TODO: Iterar sobre as aeronaves para encontrar a melhor posição em qualquer pista
     for (size_t i = 0; i < destroyed_aircrafts.size(); i++)
     {
         Aircraft aircraft_to_insert = destroyed_aircrafts[i];
         Node *best_position = nullptr;
         size_t best_runway = 0;
-        size_t best_objective = static_cast<size_t>(-1);
+        size_t best_objective = numeric_limits<size_t>::max();
 
-        for (size_t r = 0; r < solution.schedules.size(); r++)
+        // Testar todas as pistas
+        for (size_t r = 0; r < solution.schedules.size(); r++)  
         {
             Runway_Schedule &runway = solution.schedules[r];
 
-            for (size_t j = 0; j <= runway.getSize(); j++) // Inserção em todas as posições possíveis
+            // Testar todas as posições na pista
+            for (size_t j = 0; j <= runway.getSize(); j++)  
             {
                 Node *current = runway.getHead();
 
+                // Mover o ponteiro para a posição j
                 for (size_t k = 0; k < j && current; k++)
                     current = current->next;
 
-                runway.insert(current, aircraft_to_insert, aircraft_to_insert.target_time);
-                updateObjectiveFunction(aircrafts, solution);
+                // Inserir temporariamente a aeronave na posição j
+                runway.insert(current, aircraft_to_insert, -1);
 
-                if (solution.objective_function < best_objective)
+                // Calcular tempos de pouso
+                scheduleLandingTimes(aircrafts, solution);
+
+                // Verificar viabilidade e calcular função objetivo
+                if (viability_verifier(aircrafts, solution))
                 {
-                    best_objective = solution.objective_function;
-                    best_position = current;
-                    best_runway = r;
+                    updateObjectiveFunction(aircrafts, solution);
+                    if (solution.objective_function < best_objective)
+                    {
+                        best_objective = solution.objective_function;
+                        best_position = current;
+                        best_runway = r;
+                    }
                 }
 
-                if (current!=nullptr)
+                // Remover a inserção temporária
+                if (current && current->prev)
                     runway.remove(current->prev);
+                else if (current)
+                    runway.remove(current);
                 else
                     runway.remove(runway.getTail());
             }
         }
 
-        // TODO: Inserir o avião na melhor posição encontrada
-        solution.schedules[best_runway].insert(best_position, aircraft_to_insert, aircraft_to_insert.target_time);
-    }
+        // Inserir definitivamente na melhor posição e pista encontradas
+        if (best_position)
+            solution.schedules[best_runway].insert(best_position, aircraft_to_insert, -1);
+        else
+            solution.schedules[best_runway].push_back(aircraft_to_insert, -1);
 
-    updateObjectiveFunction(aircrafts, solution);
+        // Recalcular tempos de pouso após inserção definitiva
+        scheduleLandingTimes(aircrafts, solution);
+        updateObjectiveFunction(aircrafts, solution);
+    }
+}
+
+void scheduleLandingTimes(vector<Aircraft> &aircrafts, Solution &solution)
+{
+    for (size_t r = 0; r < solution.schedules.size(); r++)
+    {
+        Runway_Schedule &runway = solution.schedules[r];
+        Node *current = runway.getHead();
+
+        if (!current)
+            continue;
+
+        // Definir o tempo de pouso da primeira aeronave
+        int aircraft_id = current->aircraft.plane_index;
+        int target_time = aircrafts[aircraft_id].target_time;
+        int earliest_time = aircrafts[aircraft_id].earliest_time;
+        int latest_time = aircrafts[aircraft_id].latest_time;
+
+        // Tempo de pouso inicial: mais próximo possível do target_time
+        current->landing_time = max(earliest_time, min(target_time, latest_time));
+
+        current = current->next;
+
+        // Definir tempos de pouso para as aeronaves subsequentes
+        while (current)
+        {
+            int aircraft_id = current->aircraft.plane_index;
+            int previous_aircraft_id = current->prev->aircraft.plane_index;
+            int previous_landing_time = current->prev->landing_time;
+
+            // Calcular o tempo mínimo de pouso considerando a separação
+            int min_landing_time = max(
+                aircrafts[aircraft_id].earliest_time,
+                previous_landing_time + aircrafts[aircraft_id].separation_times[previous_aircraft_id]
+            );
+
+            // Definir o tempo de pouso como o mais próximo possível do target_time
+            int target_time = aircrafts[aircraft_id].target_time;
+            int latest_time = aircrafts[aircraft_id].latest_time;
+
+            current->landing_time = max(min_landing_time, min(target_time, latest_time));
+
+            current = current->next;
+        }
+    }
 }
 
 vector<Aircraft> destroySolution(Solution &solution)
