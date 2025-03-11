@@ -21,26 +21,25 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
     initializePheromones(pheromone, num_aircrafts, solution.initial_pheromone, aircrafts);
 
     Solution best_solution = solution;
-    size_t best_objective = solution.objective_function;
+    size_t best_objective = static_cast<size_t>(-1);
     size_t stagnant_iterations = 0;
     size_t max_stagnant_iterations = 20;
 
     for (size_t iter = 0; iter < iterations; iter++)
     {
-        vector<Solution> ant_solutions;
+        vector<Solution> ant_solutions(num_ants, NULL);
 
         for (size_t ant = 0; ant < num_ants; ant++)
         {
             // Constrói uma solução com base nos feromônios e nas regras de separação
-            Solution current_solution = constructSolution(aircrafts, pheromone, solution.num_runways, solution.exploration_rate);
-            updateObjectiveFunction(aircrafts, current_solution);
-            ant_solutions.push_back(current_solution);
+            ant_solutions[ant] = constructSolution(aircrafts, pheromone, solution.num_runways, solution.exploration_rate);
+            updateObjectiveFunction(aircrafts, ant_solutions[ant]);
             
             // Atualiza a melhor solução encontrada até agora
-            if (current_solution.objective_function < best_objective)
+            if (ant_solutions[ant].objective_function < best_objective)
             {
-                best_solution = current_solution;
-                best_objective = current_solution.objective_function;
+                best_solution = ant_solutions[ant];
+                best_objective = ant_solutions[ant].objective_function;
                 stagnant_iterations = 0;
             }
         }
@@ -198,7 +197,10 @@ Solution constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &
                 }
 
                 // Remove a inserção temporária para testar outras posições
-                runway.remove(current);
+                if (current!=nullptr)
+                    runway.remove(current->prev);
+                else
+                    runway.remove(runway.getTail());
             }
         }
         // Insere a aeronave na melhor posição e pista encontrada
