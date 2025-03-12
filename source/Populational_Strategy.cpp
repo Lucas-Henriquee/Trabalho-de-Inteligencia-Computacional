@@ -21,20 +21,24 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
     // Inicializa a matriz de feromônios com um valor base e ajuste heurístico
     initializePheromones(pheromone, num_aircrafts, solution.initial_pheromone, aircrafts);
 
-    Solution best_solution = solution;
-    size_t best_objective = static_cast<size_t>(-1);
+    Solution best_solution(solution.num_runways);
+    size_t best_objective;
     size_t stagnant_iterations = 0;
     size_t max_stagnant_iterations = 20;
 
     for (size_t iter = 0; iter < iterations; iter++)
     {
         vector<Solution> ant_solutions(num_ants, NULL);
-
         for (size_t ant = 0; ant < num_ants; ant++)
         {
             // Constrói uma solução com base nos feromônios e nas regras de separação
             ant_solutions[ant] = constructSolution(aircrafts, pheromone, solution.num_runways, solution.exploration_rate);
             updateObjectiveFunction(aircrafts, ant_solutions[ant]);
+            if(ant==0 && iter==0){
+                best_solution = ant_solutions[ant];
+                best_objective = ant_solutions[ant].objective_function;
+            }
+                
             
             // Atualiza a melhor solução encontrada até agora
             if (ant_solutions[ant].objective_function < best_objective)
@@ -45,7 +49,7 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
             }
         }
         // Atualiza os níveis de feromônio com base nas melhores soluções encontradas
-        updatePheromone(ant_solutions, pheromone, best_solution.evaporation_rate);
+        // TODO: updatePheromone(ant_solutions, pheromone, best_solution.evaporation_rate);
 
         // Critério de parada por estagnação
         stagnant_iterations++;
@@ -63,8 +67,17 @@ void initializePheromones(vector<vector<double>> &pheromone, size_t num_aircraft
     // Ajusta os feromônios considerando as penalizações das aeronaves
     for (size_t i = 0; i < num_aircrafts; i++)
         for (size_t j = 0; j < num_aircrafts; j++)
-            if (i != j)
+        {
+            if (i == j)
+            {
+                pheromone[i][j] = 0.0;
+                continue;
+            }
+            else 
+            // Feromonio de acordo com as características das aeronaves
+            //TODO: Se um latest_time for maior que o outro, a aeronave com o maior latest_time terá um feromônio maior
                 pheromone[i][j] += 1.0 / (aircrafts[j].penalty_before + aircrafts[j].penalty_after + 1e-6);
+        }
 }
 
 void updatePheromone(vector<Solution> &solutions, vector<vector<double>> &pheromone, double evaporation_rate)
