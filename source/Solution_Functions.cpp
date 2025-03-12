@@ -68,6 +68,23 @@ Solution copySolution(Solution &solution)
     return new_solution;
 }
 
+void copySolution(Solution &source, Solution &target)
+{
+    target.schedules.clear();
+    target.num_runways = source.num_runways;
+    target.objective_function = source.objective_function;
+
+    for (size_t r = 0; r < source.schedules.size(); r++)
+    {
+        Node *current = source.schedules[r].getHead();
+        while (current != nullptr)
+        {
+            target.schedules[r].push_back(current->aircraft, current->landing_time);
+            current = current->next;
+        }
+    }
+}
+
 bool viability_verifier(vector<Aircraft> &aircrafts, Solution &solution)
 {
     size_t error_counter = 0;

@@ -11,6 +11,6 @@ void initializePheromones(vector<vector<double>> &pheromone, size_t num_aircraft
 void updatePheromone(vector<Solution> &solutions, vector<vector<double>> &pheromone, double evaporation_rate);
 size_t chooseAircraft(vector<double> &probabilities, vector<Aircraft> &aircrafts, double exploration_rate);
 bool isFeasibleInsertion(Runway_Schedule &runway, Aircraft &aircraft, Node *position);
-Solution constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pheromone, size_t num_runways, double exploration_rate);
+void constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pheromone, size_t num_runways, double exploration_rate, Solution &solution);
 
 #endif // POPUlATIONAL_STRATEGY_HPP

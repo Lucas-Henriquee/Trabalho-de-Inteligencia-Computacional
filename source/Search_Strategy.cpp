@@ -43,6 +43,7 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
         if (!improved)
             non_improving++;
     } while (non_improving < 100);
+    copySolution(best_solution, solution);
 }
 
 void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Aircraft> &destroyed_aircrafts)
@@ -277,10 +278,7 @@ bool applySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_s
 
             // TODO: Verificar se a troca melhorou a solução
             if (solution.objective_function < best_solution.objective_function)
-            {
-                best_solution = copySolution(solution);
                 return true;
-            }
 
             // TODO: Se não melhorou, reverter a troca
             swap(current->aircraft, current->next->aircraft);
@@ -315,10 +313,7 @@ bool applyShift(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_
 
                 // TODO: Verificar se a nova posição melhora a solução
                 if (solution.objective_function < best_solution.objective_function)
-                {
-                    best_solution = copySolution(solution);
                     return true;
-                }
 
                 // TODO: Se não melhorar, remover e testar a próxima posição
                 solution.schedules[r].remove(insertPos->prev);
@@ -368,19 +363,13 @@ bool applyRunwaySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &
                     solution.schedules[r2].insert(node, a1, a1.target_time);
                     updateObjectiveFunction(aircrafts, solution);
                     if (solution.objective_function < best_solution.objective_function)
-                    {
-                        best_solution = copySolution(solution);
                         return true;
-                    }
                     solution.schedules[r2].remove(node->prev);
                 }
                 solution.schedules[r2].insert(nullptr, a1, a1.target_time);
                 updateObjectiveFunction(aircrafts, solution);
                 if (solution.objective_function < best_solution.objective_function)
-                {
-                    best_solution = copySolution(solution);
                     return true;
-                }
                 solution.schedules[r2].remove(solution.schedules[r2].getTail());
 
                 solution.schedules[r1].insert(pos1, a1, a1.target_time);

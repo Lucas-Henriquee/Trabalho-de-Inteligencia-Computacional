@@ -21,18 +21,19 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
     // Inicializa a matriz de feromônios com um valor base e ajuste heurístico
     initializePheromones(pheromone, num_aircrafts, solution.initial_pheromone, aircrafts);
 
-    Solution best_solution(solution.num_runways);
+    Solution best_solution = NULL;
     size_t best_objective;
     size_t stagnant_iterations = 0;
     size_t max_stagnant_iterations = 20;
+    vector<Solution> ant_solutions(num_ants, NULL);
 
     for (size_t iter = 0; iter < iterations; iter++)
     {
-        vector<Solution> ant_solutions(num_ants, NULL);
         for (size_t ant = 0; ant < num_ants; ant++)
         {
             // Constrói uma solução com base nos feromônios e nas regras de separação
-            ant_solutions[ant] = constructSolution(aircrafts, pheromone, solution.num_runways, solution.exploration_rate);
+            constructSolution(aircrafts, pheromone, solution.num_runways, solution.exploration_rate, solution);
+            ant_solutions[ant] = copySolution(solution);
             updateObjectiveFunction(aircrafts, ant_solutions[ant]);
             if(ant==0 && iter==0){
                 best_solution = ant_solutions[ant];
@@ -43,7 +44,7 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
             // Atualiza a melhor solução encontrada até agora
             if (ant_solutions[ant].objective_function < best_objective)
             {
-                best_solution = ant_solutions[ant];
+                best_solution = copySolution(ant_solutions[ant]);
                 best_objective = ant_solutions[ant].objective_function;
                 stagnant_iterations = 0;
             }
@@ -56,7 +57,7 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
         if (stagnant_iterations >= max_stagnant_iterations)
             break;
     }
-    solution = best_solution;
+    copySolution(best_solution, solution);
 }
 
 void initializePheromones(vector<vector<double>> &pheromone, size_t num_aircrafts, double initial_pheromone, vector<Aircraft> &aircrafts)
@@ -153,9 +154,8 @@ bool isFeasibleInsertion(Runway_Schedule &runway, Aircraft &aircraft, Node *posi
     return true;
 }
 
-Solution constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pheromone, size_t num_runways, double exploration_rate)
+void constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pheromone, size_t num_runways, double exploration_rate, Solution &solution)
 {
-    Solution new_solution(num_runways);
 
     // Vetor de controle para marcar quais aeronaves já foram alocadas
     vector<bool> assigned(aircrafts.size(), false);
@@ -182,7 +182,7 @@ Solution constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &
         // Itera sobre todas as pistas disponíveis para encontrar a melhor opção para pouso
         for (size_t r = 0; r < num_runways; r++)
         {
-            Runway_Schedule &runway = new_solution.schedules[r];
+            Runway_Schedule &runway = solution.schedules[r];
 
             // Percorre todas as posições possíveis dentro da pista atual
             for (size_t j = 0; j <= runway.getSize(); j++)
@@ -199,12 +199,12 @@ Solution constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &
 
                 // Insere temporariamente a aeronave na pista para avaliar a função objetivo
                 runway.insert(current, aircrafts[selected_aircraft], aircrafts[selected_aircraft].target_time);
-                updateObjectiveFunction(aircrafts, new_solution);
+                updateObjectiveFunction(aircrafts, solution);
 
                 // Se a nova solução é melhor que a melhor encontrada até agora, atualiza os valores
-                if (new_solution.objective_function < best_objective)
+                if (solution.objective_function < best_objective)
                 {
-                    best_objective = new_solution.objective_function;
+                    best_objective = solution.objective_function;
                     best_runway = r;
                     best_position = current;
                 }
@@ -217,7 +217,6 @@ Solution constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &
             }
         }
         // Insere a aeronave na melhor posição e pista encontrada
-        new_solution.schedules[best_runway].insert(best_position, aircrafts[selected_aircraft], aircrafts[selected_aircraft].target_time);
+        solution.schedules[best_runway].insert(best_position, aircrafts[selected_aircraft], aircrafts[selected_aircraft].target_time);
     }
-    return new_solution;
 }
