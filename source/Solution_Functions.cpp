@@ -4,11 +4,12 @@
 #include "../include/Aircraft_Struct.hpp"
 #include "../include/Aircraft_Functions.hpp"
 
-void printSolution(Solution &solution)
+void printSolution(vector<Aircraft> &aircrafts, Solution &solution)
 {
     cout << "----------------------------------" << endl;
     cout << "Função Objetivo: " << solution.heuristic << endl;
     cout << "Heurística Implementada: " << solution.objective_function << endl;
+    cout << "Validade da Solução: " << (viability_verifier(aircrafts, solution) ? "Válida" : "Inválida") << endl;
     cout << "----------------------------------" << endl;
 }
 

@@ -10,7 +10,7 @@ void populationalStrategy(vector<Aircraft> &aircrafts, Solution &solution, size_
 {
     solution.heuristic = "ACO";
     ACO(aircrafts, solution, population_size, generations);
-    printSolution(solution);
+    printSolution(aircrafts, solution);
 }
 
 void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_t iterations)
@@ -84,7 +84,6 @@ void updatePheromone(vector<Solution> &solutions, vector<vector<double>> &pherom
         for (size_t r = 0; r < sol.schedules.size(); r++)
         {
             Node *current = sol.schedules[r].getHead();
-
             while (current && current->next)
             {
                 // Atualiza o feromônio entre as aeronaves adjacentes

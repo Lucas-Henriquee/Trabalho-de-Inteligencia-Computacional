@@ -5,7 +5,7 @@
 #include "Solution_Struct.hpp"
 #include "Aircraft_Struct.hpp"
 
-void printSolution(Solution &solution);
+void printSolution(vector<Aircraft> &aircrafts, Solution &solution);
 size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution);
 void updateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution);
 Solution copySolution(Solution &solution);

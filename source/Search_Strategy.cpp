@@ -7,14 +7,14 @@ void constructiveStrategy(vector<Aircraft> &aircrafts, Solution &solution)
 {
     solution.heuristic = "NEH";
     NEHConstructive(aircrafts, solution, aircrafts);
-    printSolution(solution);
+    printSolution(aircrafts, solution);
 }
 
 void searchStrategy(vector<Aircraft> &aircrafts, Solution &solution)
 {
     solution.heuristic = "IG";
     IG(aircrafts, solution);
-    printSolution(solution);
+    printSolution(aircrafts, solution);
 }
 
 void IG(vector<Aircraft> &aircrafts, Solution &solution)
@@ -296,11 +296,14 @@ bool applyShift(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_
     {
         // TODO: Obter o primeiro nó da pista atual
         Node *current = solution.schedules[r].getHead();
+        size_t pos = 0;
 
         while (current)
         {
             // TODO: Remover temporariamente a aeronave
             Aircraft temp = current->aircraft;
+            Node *prev = current->prev;
+            Node *next = current->next;
             solution.schedules[r].remove(current);
 
             // TODO: Tentar inserir a aeronave em todas as posições possíveis
@@ -323,8 +326,10 @@ bool applyShift(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_
             }
 
             // TODO: Se nenhuma posição foi melhor, inserir de volta na posição original
-            solution.schedules[r].push_back(temp, temp.target_time);
-            current = current->next;
+            solution.schedules[r].insert(pos, temp, temp.target_time);
+            current = next;
+            next = current ? current->next : nullptr;
+            pos++;
         }
     }
 
@@ -339,49 +344,49 @@ bool applyRunwaySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &
     // TODO: Iterar sobre todas as combinações de pistas
     for (size_t r1 = 0; r1 < solution.schedules.size(); r1++)
     {
-        for (size_t r2 = r1 + 1; r2 < solution.schedules.size(); r2++)
+        for (size_t r2 = 0; r2 < solution.schedules.size(); r2++)
         {
+            if(r1 == r2)
+                continue;
             // TODO: Percorrer aeronaves da primeira pista
             Node *node1 = solution.schedules[r1].getHead();
+            if(node1)
+                continue;
+            Node *next1 = node1->next;
+            size_t pos1 = 0;
             while (node1)
             {
-                // TODO: Percorrer aeronaves da segunda pista
-                Node *node2 = solution.schedules[r2].getHead();
+                // TODO: Tentar trocar um avião entre as pistas r1 e r2
+                Aircraft a1 = node1->aircraft;
 
-                while (node2)
+                // TODO: Remover as aeronaves das pistas atuais
+                solution.schedules[r1].remove(node1);
+
+                // TODO: Inserir as aeronaves nas pistas trocadas
+                for(Node *node = solution.schedules[r2].getHead(); node; node = node->next)
                 {
-                    // TODO: Tentar trocar um avião entre as pistas r1 e r2
-                    Aircraft a1 = node1->aircraft;
-                    Aircraft a2 = node2->aircraft;
-
-                    // TODO: Remover as aeronaves das pistas atuais
-                    solution.schedules[r1].remove(node1);
-                    solution.schedules[r2].remove(node2);
-
-                    // TODO: Inserir as aeronaves nas pistas trocadas
-                    solution.schedules[r1].push_back(a2, a2.target_time);
-                    solution.schedules[r2].push_back(a1, a1.target_time);
-
-                    // TODO: Atualizar a função objetivo
+                    solution.schedules[r2].insert(node, a1, a1.target_time);
                     updateObjectiveFunction(aircrafts, solution);
-
-                    // TODO: Se a solução melhorou, manter a troca
                     if (solution.objective_function < best_solution.objective_function)
                     {
                         best_solution = copySolution(solution);
                         return true;
                     }
-
-                    // TODO: Se não melhorou, desfazer a troca
-                    solution.schedules[r1].remove(solution.schedules[r1].getTail());
-                    solution.schedules[r2].remove(solution.schedules[r2].getTail());
-
-                    solution.schedules[r1].push_back(a1, a1.target_time);
-                    solution.schedules[r2].push_back(a2, a2.target_time);
-
-                    node2 = node2->next;
+                    solution.schedules[r2].remove(node->prev);
                 }
-                node1 = node1->next;
+                solution.schedules[r2].insert(nullptr, a1, a1.target_time);
+                updateObjectiveFunction(aircrafts, solution);
+                if (solution.objective_function < best_solution.objective_function)
+                {
+                    best_solution = copySolution(solution);
+                    return true;
+                }
+                solution.schedules[r2].remove(solution.schedules[r2].getTail());
+
+                solution.schedules[r1].insert(pos1, a1, a1.target_time);
+                node1 = next1;
+                next1 = node1 ? node1->next : nullptr;
+                pos1++;
             }
         }
     }

@@ -26,11 +26,11 @@ int main(int argc, char *argv[])
             vector<Aircraft> aircrafts;
             readInstance(file, aircrafts);
 
-            Solution constructive_solution(num_runways);
-            constructiveStrategy(aircrafts, constructive_solution);
+            // Solution constructive_solution(num_runways);
+            // constructiveStrategy(aircrafts, constructive_solution);
 
-            // Solution search_solution(num_runways);
-            // searchStrategy(aircrafts, search_solution);
+            Solution search_solution(num_runways);
+            searchStrategy(aircrafts, search_solution);
 
             // Solution populational_solution(num_runways);
             // populational_solution.initial_pheromone = 1.0;

@@ -23,6 +23,7 @@ public:
 
     void push_back(Aircraft aircraft, int landing_time);
     void insert(Node *node, Aircraft aircraft, int landing_time);
+    void insert(size_t pos, Aircraft aircraft, int landing_time);
     void remove(Node *node);
     void print() const;
     
