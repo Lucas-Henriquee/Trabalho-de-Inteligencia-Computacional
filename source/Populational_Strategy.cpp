@@ -57,7 +57,28 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
         if (stagnant_iterations >= max_stagnant_iterations)
             break;
     }
-    copySolution(best_solution, solution);
+    solution.num_runways = best_solution.num_runways;
+    solution.objective_function = best_solution.objective_function;
+    for (size_t r = 0; r < solution.schedules.size(); r++)
+    {
+        Node *current = solution.schedules[r].getHead();
+        while (current != nullptr)
+        {
+            Node *next = current->next;
+            solution.schedules[r].remove(current);
+            current = next;
+        }
+    }
+
+    for (size_t r = 0; r < best_solution.schedules.size(); r++)
+    {
+        Node *current = best_solution.schedules[r].getHead();
+        while (current != nullptr)
+        {
+            solution.schedules[r].push_back(current->aircraft, current->landing_time);
+            current = current->next;
+        }
+    }
 }
 
 void initializePheromones(vector<vector<double>> &pheromone, size_t num_aircrafts, double initial_pheromone, vector<Aircraft> &aircrafts)
@@ -156,7 +177,8 @@ bool isFeasibleInsertion(Runway_Schedule &runway, Aircraft &aircraft, Node *posi
 
 void constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pheromone, size_t num_runways, double exploration_rate, Solution &solution)
 {
-
+    solution.schedules.clear();
+    solution.schedules.resize(num_runways);
     // Vetor de controle para marcar quais aeronaves já foram alocadas
     vector<bool> assigned(aircrafts.size(), false);
 

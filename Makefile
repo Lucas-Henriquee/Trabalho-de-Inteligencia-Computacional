@@ -39,7 +39,7 @@ all: $(TARGET)
 # Target for creating executable
 $(TARGET): $(OBJS) $(MAIN_OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(MAIN_OBJ) -o $(TARGET)
-	$(EXEC_CMD)
+#	$(EXEC_CMD)
 
 # Rule for object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
