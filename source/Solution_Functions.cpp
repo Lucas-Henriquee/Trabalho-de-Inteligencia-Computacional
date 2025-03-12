@@ -68,11 +68,20 @@ Solution copySolution(Solution &solution)
     return new_solution;
 }
 
-void copySolution(Solution &source, Solution &target)
+void copySolution(Solution source, Solution &target)
 {
-    target.schedules.clear();
     target.num_runways = source.num_runways;
     target.objective_function = source.objective_function;
+    for (size_t r = 0; r < target.schedules.size(); r++)
+    {
+        Node *current = target.schedules[r].getHead();
+        while (current != nullptr)
+        {
+            Node *next = current->next;
+            target.schedules[r].remove(current);
+            current = next;
+        }
+    }
 
     for (size_t r = 0; r < source.schedules.size(); r++)
     {
