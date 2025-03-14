@@ -43,7 +43,7 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
     do
     {
         improved = false;
-        VND(aircrafts, solution, best_solution);
+        VND(aircrafts, solution);
         if (solution.objective_function < best_solution.objective_function)
         {
             best_solution = copySolution(solution);
@@ -57,6 +57,7 @@ void IG(vector<Aircraft> &aircrafts, Solution &solution)
         if (!improved)
             non_improving++;
     } while (non_improving < 100);
+    solution = copySolution(best_solution);
 }
 
 void NEHConstructive(vector<Aircraft> &aircrafts, Solution &solution, vector<Aircraft> &destroyed_aircrafts)
@@ -247,7 +248,7 @@ vector<Aircraft> destroyRunway(Solution &solution)
     return destroyed_aircrafts;
 }
 
-void VND(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solution)
+void VND(vector<Aircraft> &aircrafts, Solution &solution)
 {
     bool improved;
 
@@ -256,28 +257,29 @@ void VND(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solutio
         improved = false;
 
         // TODO: Aplicar Swap (troca entre duas aeronaves na mesma pista)
-        if (applySwap(aircrafts, solution, best_solution))
+        if (applySwap(aircrafts, solution))
         {
             improved = true;
             continue;
         }
 
         // TODO: Aplicar Shift (mover uma aeronave e ajustar as demais)
-        if (applyShift(aircrafts, solution, best_solution))
+        if (applyShift(aircrafts, solution))
         {
             improved = true;
             continue;
         }
 
         // TODO: Aplicar Runway Swap (troca entre pistas diferentes)
-        if (applyRunwaySwap(aircrafts, solution, best_solution))
+        if (applyRunwaySwap(aircrafts, solution))
             improved = true;
 
     } while (improved);
 }
 
-bool applySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solution)
+bool applySwap(vector<Aircraft> &aircrafts, Solution &solution)
 {
+    size_t best_objective = solution.objective_function;
     for (size_t r = 0; r < solution.schedules.size(); r++) // Iterar sobre as pistas
     {
         // TODO: Obter o primeiro nó da pista atual
@@ -290,22 +292,24 @@ bool applySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_s
             updateObjectiveFunction(aircrafts, solution);
 
             // TODO: Verificar se a troca melhorou a solução
-            if (solution.objective_function < best_solution.objective_function)
+            if (solution.objective_function < best_objective)
             {
-                best_solution = copySolution(solution);
                 return true;
             }
 
             // TODO: Se não melhorou, reverter a troca
             swap(current->aircraft, current->next->aircraft);
+            scheduleLandingTimes(aircrafts, solution);
+            updateObjectiveFunction(aircrafts, solution);
             current = current->next;
         }
     }
     return false;
 }
 
-bool applyShift(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solution)
+bool applyShift(vector<Aircraft> &aircrafts, Solution &solution)
 {
+    size_t best_objective = solution.objective_function;
     for (size_t r = 0; r < solution.schedules.size(); r++) // Iterar sobre as pistas
     {
         // TODO: Obter o primeiro nó da pista atual
@@ -328,9 +332,8 @@ bool applyShift(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_
                 updateObjectiveFunction(aircrafts, solution);
 
                 // TODO: Verificar se a nova posição melhora a solução
-                if (solution.objective_function < best_solution.objective_function)
+                if (solution.objective_function < best_objective)
                 {
-                    best_solution = copySolution(solution);
                     return true;
                 }
 
@@ -347,13 +350,17 @@ bool applyShift(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_
         }
     }
 
+    scheduleLandingTimes(aircrafts, solution);
+    updateObjectiveFunction(aircrafts, solution);
     return false;
 }
 
-bool applyRunwaySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &best_solution)
+bool applyRunwaySwap(vector<Aircraft> &aircrafts, Solution &solution)
 {
     if (solution.schedules.size() < 2)
         return false; 
+    
+    size_t best_objective = solution.objective_function;
 
     // TODO: Iterar sobre todas as combinações de pistas
     for (size_t r1 = 0; r1 < solution.schedules.size(); r1++)
@@ -381,18 +388,16 @@ bool applyRunwaySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &
                 {
                     solution.schedules[r2].insert(node, a1, a1.target_time);
                     updateObjectiveFunction(aircrafts, solution);
-                    if (solution.objective_function < best_solution.objective_function)
+                    if (solution.objective_function < best_objective)
                     {
-                        best_solution = copySolution(solution);
                         return true;
                     }
                     solution.schedules[r2].remove(node->prev);
                 }
                 solution.schedules[r2].insert(nullptr, a1, a1.target_time);
                 updateObjectiveFunction(aircrafts, solution);
-                if (solution.objective_function < best_solution.objective_function)
+                if (solution.objective_function < best_objective)
                 {
-                    best_solution = copySolution(solution);
                     return true;
                 }
                 solution.schedules[r2].remove(solution.schedules[r2].getTail());
@@ -404,6 +409,8 @@ bool applyRunwaySwap(vector<Aircraft> &aircrafts, Solution &solution, Solution &
             }
         }
     }
+    scheduleLandingTimes(aircrafts, solution);
+    updateObjectiveFunction(aircrafts, solution);
 
     return false;
 }
