@@ -6,11 +6,12 @@
 
 void printSolution(vector<Aircraft> &aircrafts, Solution &solution)
 {
-    cerr << "----------------------------------" << endl;
-    cerr << "Função Objetivo: " << solution.heuristic << endl;
-    cerr << "Heurística Implementada: " << solution.objective_function << endl;
-    cerr << "Validade da Solução: " << (viability_verifier(aircrafts, solution) ? "Válida" : "Inválida") << endl;
-    cerr << "----------------------------------" << endl;
+    cout << "----------------------------------" << endl;
+    cout << "Função Objetivo: " << solution.heuristic << endl;
+    cout << "Heurística Implementada: " << solution.objective_function << endl;
+    cout << "Validade da Solução: " << (viability_verifier(aircrafts, solution) ? "Válida" : "Inválida") << endl;
+    cout << "Tempo de Execução: " << solution.execution_time << " segundos" << endl;  
+    cout << "----------------------------------" << endl;
 }
 
 size_t calculateObjectiveFunction(vector<Aircraft> &aircrafts, Solution &solution)

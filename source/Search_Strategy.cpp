@@ -5,15 +5,29 @@
 
 void constructiveStrategy(vector<Aircraft> &aircrafts, Solution &solution)
 {
+    auto start_time = chrono::high_resolution_clock::now(); 
+
     solution.heuristic = "NEH";
     NEHConstructive(aircrafts, solution, aircrafts);
+
+    auto end_time = chrono::high_resolution_clock::now();  
+    chrono::duration<double> elapsed_time = end_time - start_time; 
+
+    solution.execution_time = elapsed_time.count();
     printSolution(aircrafts, solution);
 }
 
 void searchStrategy(vector<Aircraft> &aircrafts, Solution &solution)
 {
+    auto start_time = chrono::high_resolution_clock::now(); 
+
     solution.heuristic = "IG";
     IG(aircrafts, solution);
+
+    auto end_time = chrono::high_resolution_clock::now();  
+    chrono::duration<double> elapsed_time = end_time - start_time; 
+
+    solution.execution_time = elapsed_time.count();
     printSolution(aircrafts, solution);
 }
 

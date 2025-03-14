@@ -8,8 +8,15 @@
 
 void populationalStrategy(vector<Aircraft> &aircrafts, Solution &solution, size_t population_size, size_t generations)
 {
+    auto start_time = chrono::high_resolution_clock::now(); 
+
     solution.heuristic = "ACO";
     ACO(aircrafts, solution, population_size, generations);
+
+    auto end_time = chrono::high_resolution_clock::now();  
+    chrono::duration<double> elapsed_time = end_time - start_time; 
+
+    solution.execution_time = elapsed_time.count();
     printSolution(aircrafts, solution);
 }
 
@@ -21,11 +28,11 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
     // Inicializa a matriz de feromônios com um valor base e ajuste heurístico
     initializePheromones(pheromone, num_aircrafts, solution.initial_pheromone, aircrafts);
 
-    Solution best_solution = NULL;
+    Solution best_solution(solution.num_runways);
     size_t best_objective;
     size_t stagnant_iterations = 0;
     size_t max_stagnant_iterations = 20;
-    vector<Solution> ant_solutions(num_ants, NULL);
+    vector<Solution> ant_solutions(num_ants, Solution(solution.num_runways));
 
     for (size_t iter = 0; iter < iterations; iter++)
     {

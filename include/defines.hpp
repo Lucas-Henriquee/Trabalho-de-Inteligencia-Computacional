@@ -18,6 +18,7 @@
 #include <iomanip>    /* manipulação de entrada e saída */
 #include <random>     /* implementação de funções de geração de números aleatórios */
 #include <unistd.h>   /* implementação de funções de manipulação de diretórios */
+#include <chrono>     /* implementação de funções de medição de tempo */
 
 using namespace std;
 
