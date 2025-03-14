@@ -79,6 +79,7 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
             current = current->next;
         }
     }
+    updateObjectiveFunction(aircrafts, solution);
 }
 
 void initializePheromones(vector<vector<double>> &pheromone, size_t num_aircrafts, double initial_pheromone, vector<Aircraft> &aircrafts)
