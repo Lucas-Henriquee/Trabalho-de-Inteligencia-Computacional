@@ -5,6 +5,7 @@
 #include "../include/Solution_Functions.hpp"
 #include "../include/Runway_Schedule.hpp"
 #include "../include/Populational_Strategy.hpp"
+#include "../include/Search_Strategy.hpp"
 
 void populationalStrategy(vector<Aircraft> &aircrafts, Solution &solution, size_t population_size, size_t generations)
 {
@@ -28,7 +29,7 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
     // Inicializa a matriz de feromônios com um valor base e ajuste heurístico
     initializePheromones(pheromone, num_aircrafts, solution.initial_pheromone, aircrafts);
 
-    Solution best_solution(solution.num_runways);
+    Solution best_solution = NULL;
     size_t best_objective;
     size_t stagnant_iterations = 0;
     size_t max_stagnant_iterations = 20;
@@ -41,9 +42,10 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
             // Constrói uma solução com base nos feromônios e nas regras de separação
             constructSolution(aircrafts, pheromone, solution.num_runways, solution.exploration_rate, solution);
             ant_solutions[ant] = copySolution(solution);
+            scheduleLandingTimes(aircrafts, ant_solutions[ant]);
             updateObjectiveFunction(aircrafts, ant_solutions[ant]);
             if(ant==0 && iter==0){
-                best_solution = ant_solutions[ant];
+                best_solution = copySolution(ant_solutions[ant]);
                 best_objective = ant_solutions[ant].objective_function;
             }
                 
@@ -57,7 +59,7 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
             }
         }
         // Atualiza os níveis de feromônio com base nas melhores soluções encontradas
-        // TODO: updatePheromone(ant_solutions, pheromone, best_solution.evaporation_rate);
+        updatePheromone(ant_solutions, pheromone, best_solution.evaporation_rate);
 
         // Critério de parada por estagnação
         stagnant_iterations++;
@@ -86,6 +88,8 @@ void ACO(vector<Aircraft> &aircrafts, Solution &solution, size_t num_ants, size_
             current = current->next;
         }
     }
+    solution = copySolution(best_solution);
+    scheduleLandingTimes(aircrafts, solution);
     updateObjectiveFunction(aircrafts, solution);
 }
 
@@ -94,19 +98,28 @@ void initializePheromones(vector<vector<double>> &pheromone, size_t num_aircraft
     // Inicializa a matriz de feromônios com o valor base
     pheromone.resize(num_aircrafts, vector<double>(num_aircrafts, initial_pheromone));
 
+    
     // Ajusta os feromônios considerando as penalizações das aeronaves
     for (size_t i = 0; i < num_aircrafts; i++)
         for (size_t j = 0; j < num_aircrafts; j++)
         {
             if (i == j)
-            {
                 pheromone[i][j] = 0.0;
-                continue;
-            }
             else 
-            // Feromonio de acordo com as características das aeronaves
-            //TODO: Se um latest_time for maior que o outro, a aeronave com o maior latest_time terá um feromônio maior
-                pheromone[i][j] += 1.0 / (aircrafts[j].penalty_before + aircrafts[j].penalty_after + 1e-6);
+            {
+                if(aircrafts[i].latest_time < aircrafts[j].earliest_time)
+                {
+                    pheromone[i][j] = 1.0;
+                }
+                else if(aircrafts[i].earliest_time > aircrafts[j].latest_time)
+                {
+                    pheromone[i][j] = 0.0;
+                }
+                else
+                {
+                    pheromone[i][j] = 0.5;
+                }
+            }
         }
 }
 
@@ -127,22 +140,30 @@ void updatePheromone(vector<Solution> &solutions, vector<vector<double>> &pherom
         for (size_t r = 0; r < sol.schedules.size(); r++)
         {
             Node *current = sol.schedules[r].getHead();
-            while (current && current->next)
+            while (current)
             {
-                // Atualiza o feromônio entre as aeronaves adjacentes
-                int a1 = current->aircraft.plane_index;
-                int a2 = current->next->aircraft.plane_index;
-                pheromone[a1][a2] += contribution;
-
+                Node *another = current->next;
+                while (another)
+                {
+                    int a1 = current->aircraft.plane_index;
+                    int a2 = another->aircraft.plane_index;
+                    pheromone[a1][a2] += contribution;
+                    another = another->next;
+                }
                 current = current->next;
             }
         }
     }
 }
 
-size_t chooseAircraft(vector<double> &probabilities, vector<Aircraft> &aircrafts, double exploration_rate)
+size_t chooseAircraft(vector<double> &probabilities, vector<Aircraft> &aircrafts, double exploration_rate, vector<bool> &assigned)
 {
-    double sum_probabilities = accumulate(probabilities.begin(), probabilities.end(), 0.0);
+    double sum_probabilities = 0.0;
+
+    for(size_t i = 0; i < probabilities.size(); i++)
+        if(!assigned[i])
+            sum_probabilities += probabilities[i];
+
     double rand_value = ((double)rand() / RAND_MAX);
 
     // Exploração aleatória
@@ -156,8 +177,9 @@ size_t chooseAircraft(vector<double> &probabilities, vector<Aircraft> &aircrafts
     // Percorre as probabilidades acumuladas e seleciona a aeronave correspondente
     for (size_t j = 0; j < probabilities.size(); j++)
     {
+        if(assigned[j])
+            continue;
         cumulative_prob += probabilities[j];
-
         if (cumulative_prob >= rand_value)
             return j;
     }
@@ -170,13 +192,14 @@ bool isFeasibleInsertion(Runway_Schedule &runway, Aircraft &aircraft, Node *posi
 {
     // Obtém a aeronave anterior na fila, caso exista
     Node *prev = position ? position->prev : runway.getTail();
+    
 
     // Verifica se a aeronave pode ser inserida respeitando as regras de separação
     if (prev)
     {
         size_t min_separation = aircraft.separation_times[prev->aircraft.plane_index];
 
-        if (aircraft.target_time < prev->landing_time + min_separation)
+        if (aircraft.latest_time < prev->landing_time + min_separation)
             return false;
     }
 
@@ -198,10 +221,10 @@ void constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pher
 
         for (size_t j = 0; j < aircrafts.size(); j++)
             if (!assigned[j])
-                probabilities[j] = pheromone[i][j];
+                probabilities[j] += pheromone[i][j];
 
         // Escolhe uma aeronave com base nas probabilidades calculadas
-        size_t selected_aircraft = chooseAircraft(probabilities, aircrafts, exploration_rate);
+        size_t selected_aircraft = chooseAircraft(probabilities, aircrafts, exploration_rate, assigned);
         assigned[selected_aircraft] = true;
 
         // Variáveis auxiliares para encontrar a melhor pista e posição de pouso
@@ -229,6 +252,7 @@ void constructSolution(vector<Aircraft> &aircrafts, vector<vector<double>> &pher
 
                 // Insere temporariamente a aeronave na pista para avaliar a função objetivo
                 runway.insert(current, aircrafts[selected_aircraft], aircrafts[selected_aircraft].target_time);
+                
                 updateObjectiveFunction(aircrafts, solution);
 
                 // Se a nova solução é melhor que a melhor encontrada até agora, atualiza os valores
